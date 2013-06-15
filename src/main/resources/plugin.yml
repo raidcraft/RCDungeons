@@ -1,0 +1,8 @@
+main: de.raidcraft.dungeons.DungeonsPlugin
+name: RCDungeons
+version: ${project.version}#${build.number}
+description: Plugin for creating dungeon instances and stuff.
+author: Silthus
+website: http://www.raid-craft.de
+depend: [RaidCraft-API]
+database: true

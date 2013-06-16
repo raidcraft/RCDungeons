@@ -25,6 +25,9 @@ public class TDungeon {
     @OneToMany
     @JoinColumn(name = "dungeon_id")
     private List<TDungeonInstance> instances;
+    @OneToMany
+    @JoinColumn(name = "dungeon_id")
+    private List<TDungeonPlayer> players;
 
     public int getId() {
 
@@ -54,5 +57,15 @@ public class TDungeon {
     public void setInstances(List<TDungeonInstance> instances) {
 
         this.instances = instances;
+    }
+
+    public List<TDungeonPlayer> getPlayers() {
+
+        return players;
+    }
+
+    public void setPlayers(List<TDungeonPlayer> players) {
+
+        this.players = players;
     }
 }

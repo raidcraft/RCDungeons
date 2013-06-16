@@ -20,6 +20,8 @@ public class TDungeonPlayer {
     @NotNull
     private String player;
     @ManyToOne
+    private TDungeon dungeon;
+    @ManyToOne
     private TDungeonInstance dungeonInstance;
     private Timestamp joinTime;
     private Timestamp lastJoin;
@@ -72,5 +74,15 @@ public class TDungeonPlayer {
     public void setLastJoin(Timestamp lastJoin) {
 
         this.lastJoin = lastJoin;
+    }
+
+    public TDungeon getDungeon() {
+
+        return dungeon;
+    }
+
+    public void setDungeon(TDungeon dungeon) {
+
+        this.dungeon = dungeon;
     }
 }

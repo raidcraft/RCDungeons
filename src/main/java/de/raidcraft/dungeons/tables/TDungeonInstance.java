@@ -2,6 +2,7 @@ package de.raidcraft.dungeons.tables;
 
 import com.avaje.ebean.validation.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -22,6 +23,9 @@ public class TDungeonInstance {
     private int id;
     @ManyToOne
     private TDungeon dungeon;
+    @NotNull
+    @Column(unique = true)
+    private String world;
     @NotNull
     private Timestamp creationTime;
     private boolean active;

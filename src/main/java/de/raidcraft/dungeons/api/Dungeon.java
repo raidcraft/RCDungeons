@@ -1,5 +1,9 @@
 package de.raidcraft.dungeons.api;
 
+import org.bukkit.Location;
+
+import java.util.List;
+
 /**
  * @author Silthus
  */
@@ -39,6 +43,20 @@ public interface Dungeon {
      * @return time until dungeon is resettet
      */
     public long getResetTimeMillis();
+
+    /**
+     * Gets the location where players spawn when they initially enter the dungeon.
+     *
+     * @return default spawn location
+     */
+    public Location getSpawnLocation();
+
+    /**
+     * Gets a list of active instaces of this dungeon.
+     *
+     * @return list of instances
+     */
+    public List<DungeonInstance> getActiveInstances();
 
     /**
      * Creates a new instance of the dungeon for the given party.

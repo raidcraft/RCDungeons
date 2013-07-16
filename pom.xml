@@ -23,10 +23,14 @@
     <version>1.1.5-SNAPSHOT</version>
     <name>RCDungeons</name>
 
+    <scm>
+        <developerConnection>scm:git:ssh://git@git.raid-craft.de:22109/rcdungeons.git</developerConnection>
+    </scm>
+
     <parent>
         <groupId>de.raidcraft</groupId>
         <artifactId>masterpom</artifactId>
-        <version>LATEST</version>
+        <version>RELEASE</version>
     </parent>
 
     <repositories>
@@ -40,12 +44,12 @@
         <dependency>
             <groupId>de.raidcraft</groupId>
             <artifactId>raidcraft-api</artifactId>
-            <version>LATEST</version>
+            <version>${rc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
-            <version>LATEST</version>
+            <version>${rc.version}</version>
         </dependency>
     </dependencies>
 </project>

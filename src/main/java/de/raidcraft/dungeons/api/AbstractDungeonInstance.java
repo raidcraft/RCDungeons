@@ -1,10 +1,10 @@
 package de.raidcraft.dungeons.api;
 
+import de.raidcraft.util.CaseInsensitiveMap;
+
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Silthus
@@ -13,9 +13,10 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
 
     private final int id;
     private final Dungeon dungeon;
-    private final Set<String> players = new HashSet<>();
+    private final Map<String, DungeonPlayer> players = new CaseInsensitiveMap<>();
     private boolean active;
     private boolean completed;
+    private boolean locked;
     protected Timestamp creationTime;
 
     public AbstractDungeonInstance(int id, Dungeon dungeon) {
@@ -43,21 +44,39 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     }
 
     @Override
-    public void addPlayer(String player) {
+    public void addPlayer(DungeonPlayer player) {
 
-        this.players.add(player);
+        players.put(player.getName(), player);
     }
 
     @Override
-    public boolean removePlayer(String player) {
+    public DungeonPlayer removePlayer(DungeonPlayer player) {
 
-        return this.players.remove(player);
+        return removePlayer(player.getName());
     }
 
     @Override
-    public List<String> getPlayers() {
+    public DungeonPlayer removePlayer(String player) {
 
-        return new ArrayList<>(players);
+        return players.remove(player);
+    }
+
+    @Override
+    public boolean containsPlayer(DungeonPlayer player) {
+
+        return containsPlayer(player.getName());
+    }
+
+    @Override
+    public boolean containsPlayer(String player) {
+
+        return players.containsKey(player);
+    }
+
+    @Override
+    public Collection<DungeonPlayer> getPlayers() {
+
+        return players.values();
     }
 
     @Override
@@ -82,5 +101,17 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     public void setCompleted(boolean completed) {
 
         this.completed = completed;
+    }
+
+    @Override
+    public boolean isLocked() {
+
+        return locked || getDungeon().isLocked();
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+
+        this.locked = locked;
     }
 }

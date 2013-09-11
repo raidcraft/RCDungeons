@@ -1,5 +1,7 @@
 package de.raidcraft.dungeons.api;
 
+import org.bukkit.Location;
+
 import java.util.List;
 
 /**
@@ -7,12 +9,23 @@ import java.util.List;
  */
 public interface DungeonPlayer {
 
+    public int getId();
+
     /**
      * Gets the name of the player.
      *
      * @return player name
      */
     public String getName();
+
+    public void setLastPosition(Location lastPosition);
+
+    /**
+     * Gets the last position of the player before he was teleported to the dungeon.
+     *
+     * @return last position of the player
+     */
+    public Location getLastPosition();
 
     /**
      * Gets a list of dungeons the player is enlisted in.
@@ -29,4 +42,10 @@ public interface DungeonPlayer {
      * @return new or existing instance
      */
     public DungeonInstance getDungeonInstance(Dungeon dungeon);
+
+    public DungeonInstance getActiveInstance();
+
+    public void leaveActiveDungeon(DungeonReason reason);
+
+    public void save();
 }

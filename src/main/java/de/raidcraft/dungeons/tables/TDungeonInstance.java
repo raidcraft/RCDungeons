@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Silthus
@@ -30,9 +30,30 @@ public class TDungeonInstance {
     private Timestamp creationTime;
     private boolean active;
     private boolean completed;
+    private boolean locked;
     @OneToMany
     @JoinColumn(name = "dungeon_instance_id")
-    private List<TDungeonPlayer> players;
+    private Set<TDungeonPlayer> players;
+
+    public String getWorld() {
+
+        return world;
+    }
+
+    public void setWorld(String world) {
+
+        this.world = world;
+    }
+
+    public boolean isLocked() {
+
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+
+        this.locked = locked;
+    }
 
     public int getId() {
 
@@ -84,12 +105,12 @@ public class TDungeonInstance {
         this.completed = completed;
     }
 
-    public List<TDungeonPlayer> getPlayers() {
+    public Set<TDungeonPlayer> getPlayers() {
 
         return players;
     }
 
-    public void setPlayers(List<TDungeonPlayer> players) {
+    public void setPlayers(Set<TDungeonPlayer> players) {
 
         this.players = players;
     }

@@ -30,12 +30,16 @@ public interface Dungeon {
      */
     public String getFriendlyName();
 
+    public void setFriendlyName(String friendlyName);
+
     /**
      * Gets a description of the dungeon.
      *
      * @return short description
      */
     public String getDescription();
+
+    public void setDescription(String description);
 
     /**
      * Gets the time players have to clear the dungeon before it resets.
@@ -44,6 +48,8 @@ public interface Dungeon {
      */
     public long getResetTimeMillis();
 
+    public void setResetTimeMillis(long resetTime);
+
     /**
      * Gets the location where players spawn when they initially enter the dungeon.
      *
@@ -51,12 +57,37 @@ public interface Dungeon {
      */
     public Location getSpawnLocation();
 
+    public void setSpawnLocation(Location location);
+
+    /**
+     * Locks the dungeon preventing the creation of new dungeon instances and prevents
+     * all created instances from beeing entered.
+     *
+     * @return true if dungeon is locked
+     */
+    public boolean isLocked();
+
+    /**
+     * Locks the dungeon preventing new creation of dungeon instances. Also prevents
+     * players in active instances from entering the instance.
+     *
+     * @param locked state of the dungeon
+     */
+    public void setLocked(boolean locked);
+
     /**
      * Gets a list of active instaces of this dungeon.
      *
-     * @return list of instances
+     * @return list of active instances
      */
     public List<DungeonInstance> getActiveInstances();
+
+    /**
+     * Gets all instances that where created for this dungeon.
+     *
+     * @return list of all instances
+     */
+    public List<DungeonInstance> getInstances();
 
     /**
      * Creates a new instance of the dungeon for the given party.
@@ -73,5 +104,7 @@ public interface Dungeon {
      * @param player to get instance for
      * @return new or existing dungeon instance
      */
-    public DungeonInstance getInstance(String player);
+    public DungeonInstance getActiveInstance(String player);
+
+    public void save();
 }

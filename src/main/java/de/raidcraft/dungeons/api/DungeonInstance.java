@@ -3,7 +3,7 @@ package de.raidcraft.dungeons.api;
 import org.bukkit.World;
 
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author Silthus
@@ -44,7 +44,16 @@ public interface DungeonInstance {
      *
      * @return true if world was unloaded, false if world could not be unloaded
      */
-    public boolean unloadWorld(boolean force);
+    public boolean unload(boolean force);
+
+    /**
+     * Unloads the dungeon instance and then deletes the world from the harddisk.
+     *
+     * @param force false will not delete and unload the world when it is still used.
+     *
+     * @return true if deletion of the world was successful
+     */
+    public boolean delete(boolean force);
 
     /**
      * Gets the time the instance was created
@@ -58,7 +67,7 @@ public interface DungeonInstance {
      *
      * @param player to add to the instance
      */
-    public void addPlayer(String player);
+    public void addPlayer(DungeonPlayer player);
 
     /**
      * Removes the vien player from the dungeon instance if he is in it.
@@ -66,14 +75,40 @@ public interface DungeonInstance {
      * @param player to remove from the instance
      * @return true if player was removed, false if he wasn't in the dungeon
      */
-    public boolean removePlayer(String player);
+    public DungeonPlayer removePlayer(DungeonPlayer player);
+
+    /**
+     * Removes the vien player from the dungeon instance if he is in it.
+     *
+     * @param player to remove from the instance
+     * @return true if player was removed, false if he wasn't in the dungeon
+     */
+    public DungeonPlayer removePlayer(String player);
+
+    /**
+     * Checks if the dungeon instance contains the player. Will also return true if
+     * the player is not in the instance and only registered for it.
+     *
+     * @param player to check for
+     * @return true if player is registered in this instance
+     */
+    public boolean containsPlayer(DungeonPlayer player);
+
+    /**
+     * Checks if the dungeon instance contains the player. Will also return true if
+     * the player is not in the instance and only registered for it.
+     *
+     * @param player to check for
+     * @return true if player is registered in this instance
+     */
+    public boolean containsPlayer(String player);
 
     /**
      * Gets all players that are attached to this instance.
      *
      * @return list of players playing in this instance
      */
-    public List<String> getPlayers();
+    public Collection<DungeonPlayer> getPlayers();
 
     /**
      * Checks if the instance is currently used by players.
@@ -102,6 +137,22 @@ public interface DungeonInstance {
      * @param completed true if dungeon is cleared
      */
     public void setCompleted(boolean completed);
+
+    /**
+     * Checks if the dungeon is locked by an admin or other reasons. This prevents
+     * players from entering the dungeon instance.
+     * Will also check if the base dungeon template is locked.
+     *
+     * @return true if the base dungeon or the instance is locked.
+     */
+    public boolean isLocked();
+
+    /**
+     * Sets the dungeon instance as locked preventing player access.
+     *
+     * @param locked true if players cannot enter
+     */
+    public void setLocked(boolean locked);
 
     /**
      * Saves the world and every data to the database and files.

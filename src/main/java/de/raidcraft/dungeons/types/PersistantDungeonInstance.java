@@ -5,14 +5,13 @@ import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.AbstractDungeonInstance;
 import de.raidcraft.dungeons.api.Dungeon;
+import de.raidcraft.dungeons.api.DungeonPlayer;
+import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
-
-import java.sql.Timestamp;
 
 /**
  * @author Silthus
@@ -21,17 +20,24 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
     private final String world;
 
-    public PersistantDungeonInstance(TDungeonInstance instance, Dungeon dungeon, String world) {
+    public PersistantDungeonInstance(TDungeonInstance instance, Dungeon dungeon) {
 
         super(instance.getId(), dungeon);
         this.creationTime = instance.getCreationTime();
-        this.world = world;
+        this.world = dungeon.getName() + instance.getId();
+        setLocked(instance.isLocked());
+        setCompleted(instance.isCompleted());
+        setActive(instance.isActive());
     }
 
     @Override
     public World getWorld() {
 
-        return Bukkit.getWorld(world);
+        World world = Bukkit.getWorld(this.world);
+        if (world == null) {
+            world = loadWorld();
+        }
+        return world;
     }
 
     @Override
@@ -41,23 +47,23 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     }
 
     @Override
-    public boolean unloadWorld(boolean force) {
+    public boolean unload(boolean force) {
 
         if (!force && isActive()) {
             return false;
         }
         if (force && isActive()) {
-            Player player;
-            for (String playerName : getPlayers()) {
-                player = Bukkit.getPlayer(playerName);
-                if (player == null) {
-                    continue;
-                }
-                // TODO: use multiworld plugin to transfer player to his last position
-                player.kickPlayer("Dungeon wurde geschlossen.");
+            for (DungeonPlayer player : getPlayers()) {
+                player.leaveActiveDungeon(DungeonReason.UNLOAD);
             }
         }
         return Bukkit.unloadWorld(getWorld(), true);
+    }
+
+    @Override
+    public boolean delete(boolean force) {
+
+        return unload(force) && getWorld().getWorldFolder().delete();
     }
 
     @Override
@@ -70,19 +76,10 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
         TDungeonInstance instance = database.find(TDungeonInstance.class, getId());
         instance.setActive(isActive());
         instance.setCompleted(isCompleted());
-        TDungeonPlayer tPlayer;
-        for (String player : getPlayers()) {
-            tPlayer = database.find(TDungeonPlayer.class).where().eq("player", player).eq("dungeon_instance", getId()).findUnique();
-            if (tPlayer == null) {
-                tPlayer = new TDungeonPlayer();
-                tPlayer.setPlayer(player);
-                tPlayer.setDungeonInstance(instance);
-                tPlayer.setJoinTime(new Timestamp(System.currentTimeMillis()));
-                database.save(tPlayer);
-            }
-            tPlayer.setLastJoin(new Timestamp(System.currentTimeMillis()));
-            database.update(tPlayer);
-            instance.getPlayers().add(tPlayer);
+        instance.setLocked(isLocked());
+        for (DungeonPlayer player : getPlayers()) {
+            player.save();
+            instance.getPlayers().add(database.find(TDungeonPlayer.class, player.getId()));
         }
         database.update(instance);
     }

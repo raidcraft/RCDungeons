@@ -22,12 +22,16 @@ public class TDungeon {
     @NotNull
     @Column(unique = true)
     private String name;
+    private String friendlyName;
+    private String description;
+    private long resetTimeMillis;
+    private boolean locked;
+    @OneToMany
+    @JoinColumn(name = "dungeon_id")
+    private List<TDungeonSpawn> spawns;
     @OneToMany
     @JoinColumn(name = "dungeon_id")
     private List<TDungeonInstance> instances;
-    @OneToMany
-    @JoinColumn(name = "dungeon_id")
-    private List<TDungeonPlayer> players;
 
     public int getId() {
 
@@ -49,6 +53,56 @@ public class TDungeon {
         this.name = name;
     }
 
+    public String getFriendlyName() {
+
+        return friendlyName;
+    }
+
+    public void setFriendlyName(String friendlyName) {
+
+        this.friendlyName = friendlyName;
+    }
+
+    public String getDescription() {
+
+        return description;
+    }
+
+    public void setDescription(String description) {
+
+        this.description = description;
+    }
+
+    public long getResetTimeMillis() {
+
+        return resetTimeMillis;
+    }
+
+    public void setResetTimeMillis(long resetTimeMillis) {
+
+        this.resetTimeMillis = resetTimeMillis;
+    }
+
+    public boolean isLocked() {
+
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+
+        this.locked = locked;
+    }
+
+    public List<TDungeonSpawn> getSpawns() {
+
+        return spawns;
+    }
+
+    public void setSpawns(List<TDungeonSpawn> spawns) {
+
+        this.spawns = spawns;
+    }
+
     public List<TDungeonInstance> getInstances() {
 
         return instances;
@@ -57,15 +111,5 @@ public class TDungeon {
     public void setInstances(List<TDungeonInstance> instances) {
 
         this.instances = instances;
-    }
-
-    public List<TDungeonPlayer> getPlayers() {
-
-        return players;
-    }
-
-    public void setPlayers(List<TDungeonPlayer> players) {
-
-        this.players = players;
     }
 }

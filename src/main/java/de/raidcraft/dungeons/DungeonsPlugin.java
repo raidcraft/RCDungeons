@@ -3,7 +3,9 @@ package de.raidcraft.dungeons;
 import de.raidcraft.api.BasePlugin;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
+import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
+import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.dungeons.worldedit.CopyManager;
 
 import java.util.ArrayList;
@@ -29,6 +31,11 @@ public class DungeonsPlugin extends BasePlugin {
 
     }
 
+    public DungeonManager getDungeonManager() {
+
+        return dungeonManager;
+    }
+
     public CopyManager getCopyManager() {
 
         return copyManager;
@@ -41,6 +48,8 @@ public class DungeonsPlugin extends BasePlugin {
         tables.add(TDungeon.class);
         tables.add(TDungeonInstance.class);
         tables.add(TDungeonPlayer.class);
+        tables.add(TDungeonSpawn.class);
+        tables.add(TDungeonInstancePlayer.class);
         return tables;
     }
 }

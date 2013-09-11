@@ -1,12 +1,15 @@
 package de.raidcraft.dungeons.tables;
 
 import com.avaje.ebean.validation.NotNull;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * @author Silthus
@@ -18,13 +21,22 @@ public class TDungeonPlayer {
     @Id
     private int id;
     @NotNull
-    private String player;
-    @ManyToOne
-    private TDungeon dungeon;
-    @ManyToOne
-    private TDungeonInstance dungeonInstance;
-    private Timestamp joinTime;
-    private Timestamp lastJoin;
+    private String name;
+    private String lastWorld;
+    private double lastX;
+    private double lastY;
+    private double lastZ;
+    private long lastYaw;
+    private long lastPitch;
+    @OneToMany
+    @JoinColumn(name = "player_id")
+    private List<TDungeonInstancePlayer> instances;
+
+
+    public Location getLastPosition() {
+
+        return new Location(Bukkit.getWorld(lastWorld), lastX, lastY, lastZ, lastYaw, lastPitch);
+    }
 
     public int getId() {
 
@@ -36,53 +48,83 @@ public class TDungeonPlayer {
         this.id = id;
     }
 
-    public String getPlayer() {
+    public String getName() {
 
-        return player;
+        return name;
     }
 
-    public void setPlayer(String player) {
+    public void setName(String name) {
 
-        this.player = player;
+        this.name = name;
     }
 
-    public TDungeonInstance getDungeonInstance() {
+    public String getLastWorld() {
 
-        return dungeonInstance;
+        return lastWorld;
     }
 
-    public void setDungeonInstance(TDungeonInstance dungeonInstance) {
+    public void setLastWorld(String lastWorld) {
 
-        this.dungeonInstance = dungeonInstance;
+        this.lastWorld = lastWorld;
     }
 
-    public Timestamp getJoinTime() {
+    public double getLastX() {
 
-        return joinTime;
+        return lastX;
     }
 
-    public void setJoinTime(Timestamp joinTime) {
+    public void setLastX(double lastX) {
 
-        this.joinTime = joinTime;
+        this.lastX = lastX;
     }
 
-    public Timestamp getLastJoin() {
+    public double getLastY() {
 
-        return lastJoin;
+        return lastY;
     }
 
-    public void setLastJoin(Timestamp lastJoin) {
+    public void setLastY(double lastY) {
 
-        this.lastJoin = lastJoin;
+        this.lastY = lastY;
     }
 
-    public TDungeon getDungeon() {
+    public double getLastZ() {
 
-        return dungeon;
+        return lastZ;
     }
 
-    public void setDungeon(TDungeon dungeon) {
+    public void setLastZ(double lastZ) {
 
-        this.dungeon = dungeon;
+        this.lastZ = lastZ;
+    }
+
+    public long getLastYaw() {
+
+        return lastYaw;
+    }
+
+    public void setLastYaw(long lastYaw) {
+
+        this.lastYaw = lastYaw;
+    }
+
+    public long getLastPitch() {
+
+        return lastPitch;
+    }
+
+    public void setLastPitch(long lastPitch) {
+
+        this.lastPitch = lastPitch;
+    }
+
+    public List<TDungeonInstancePlayer> getInstances() {
+
+        return instances;
+    }
+
+    public void setInstances(List<TDungeonInstancePlayer> instances) {
+
+        this.instances = instances;
     }
 }

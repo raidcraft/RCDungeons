@@ -62,12 +62,16 @@ public interface DungeonInstance {
      */
     public Timestamp getCreationTime();
 
+    public void teleport(DungeonPlayer player);
+
     /**
      * Adds the given player to the dungeon instance.
      *
      * @param player to add to the instance
      */
     public void addPlayer(DungeonPlayer player);
+
+    public void addPlayer(DungeonPlayer player, boolean teleport);
 
     /**
      * Removes the vien player from the dungeon instance if he is in it.
@@ -76,6 +80,8 @@ public interface DungeonInstance {
      * @return true if player was removed, false if he wasn't in the dungeon
      */
     public DungeonPlayer removePlayer(DungeonPlayer player);
+
+    public DungeonPlayer removePlayer(DungeonPlayer player, boolean teleport);
 
     /**
      * Removes the vien player from the dungeon instance if he is in it.

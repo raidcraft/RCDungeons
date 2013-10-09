@@ -20,6 +20,8 @@ import com.sk89q.worldedit.data.DataException;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.api.Component;
 import de.raidcraft.dungeons.DungeonsPlugin;
+import de.raidcraft.dungeons.api.Dungeon;
+import de.raidcraft.util.CaseInsensitiveMap;
 import de.raidcraft.util.HistoryHashMap;
 import org.bukkit.World;
 
@@ -37,12 +39,12 @@ public class CopyManager implements Component {
     /**
      * Cache.
      */
-    private final HashMap<String, HistoryHashMap<String, CuboidCopy>> cache = new HashMap<>();
+    private final HashMap<String, HistoryHashMap<String, CuboidCopy>> cache = new CaseInsensitiveMap<>();
 
     /**
      * Remembers missing copies so as to not look for them on disk.
      */
-    private final HashMap<String, HistoryHashMap<String, Long>> missing = new HashMap<>();
+    private final HashMap<String, HistoryHashMap<String, Long>> missing = new CaseInsensitiveMap<>();
 
     private final DungeonsPlugin plugin;
 
@@ -77,16 +79,15 @@ public class CopyManager implements Component {
      * @throws MissingCuboidCopyException
      * @throws CuboidCopyException
      */
-    public CuboidCopy load(World world, String dungeon) throws IOException, CuboidCopyException {
+    public CuboidCopy load(World world, Dungeon dungeon) throws IOException, CuboidCopyException {
 
-        dungeon = dungeon.toLowerCase();
-        String cacheKey = dungeon;
+        String cacheKey = dungeon.getName();
 
         HistoryHashMap<String, Long> missing = getMissing(world.getUID().toString());
 
         if (missing.containsKey(cacheKey)) {
             long lastCheck = missing.get(cacheKey);
-            if (lastCheck > System.currentTimeMillis()) throw new MissingCuboidCopyException(dungeon);
+            if (lastCheck > System.currentTimeMillis()) throw new MissingCuboidCopyException(dungeon.getName());
         }
 
         HistoryHashMap<String, CuboidCopy> cache = getCache(world.getUID().toString());
@@ -95,7 +96,7 @@ public class CopyManager implements Component {
 
         if (copy == null) {
             File folder = new File(plugin.getDataFolder(), "dungeons/");
-            copy = CuboidCopy.load(new File(folder, dungeon + getFileSuffix()), world);
+            copy = CuboidCopy.load(new File(folder, dungeon.getName() + getFileSuffix()), world);
             missing.remove(cacheKey);
             cache.put(cacheKey, copy);
             return copy;
@@ -122,13 +123,9 @@ public class CopyManager implements Component {
             folder.mkdirs();
         }
 
-        dungeon = dungeon.toLowerCase();
-
-        String cacheKey = dungeon;
-
         copyFlat.save(new File(folder, dungeon + getFileSuffix()));
-        missing.remove(cacheKey);
-        cache.put(cacheKey, copyFlat);
+        missing.remove(dungeon);
+        cache.put(dungeon, copyFlat);
     }
 
     private HistoryHashMap<String, CuboidCopy> getCache(String world) {

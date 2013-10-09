@@ -43,7 +43,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     @Override
     public World loadWorld() {
 
-        return Bukkit.getServer().createWorld(new DungeonWorldCreator(this.world));
+        return Bukkit.getServer().createWorld(new DungeonWorldCreator(this.world, this));
     }
 
     @Override

@@ -10,6 +10,7 @@ import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
+import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
@@ -63,7 +64,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     @Override
     public boolean delete(boolean force) {
 
-        return unload(force) && getWorld().getWorldFolder().delete();
+        return unload(force) && DungeonUtils.deleteWorld(getWorld());
     }
 
     @Override

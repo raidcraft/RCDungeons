@@ -1,10 +1,9 @@
 package de.raidcraft.dungeons;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.BukkitUtil;
+import com.sk89q.worldedit.IncompleteRegionException;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
-import com.sk89q.worldedit.data.DataException;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.api.Component;
 import de.raidcraft.api.RaidCraftException;
@@ -12,26 +11,30 @@ import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
+import de.raidcraft.dungeons.creator.CoordXZ;
+import de.raidcraft.dungeons.creator.DungeonWorldCreator;
+import de.raidcraft.dungeons.creator.WorldTrimTask;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
-import de.raidcraft.dungeons.worldedit.MCEditCuboidCopy;
 import de.raidcraft.util.CaseInsensitiveMap;
 import de.raidcraft.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Silthus
@@ -111,17 +114,22 @@ public class DungeonManager implements Component {
         plugin.getDatabase().save(spawn);
 
         SimpleDungeon dungeon = new SimpleDungeon(tDungeon);
+
         try {
             // then copy the player selection and save it as the dungeon template
             Selection selection = worldEdit.getSelection(creator);
-            Vector min = BukkitUtil.toVector(selection.getMinimumPoint());
-            Vector max = BukkitUtil.toVector(selection.getMaximumPoint());
-            Vector size = max.subtract(min).add(1, 1, 1);
-            MCEditCuboidCopy copy = new MCEditCuboidCopy(min, size, creator.getWorld());
-            copy.copy();
-            plugin.getCopyManager().save(creator.getWorld(), name, copy);
-        } catch (IOException | DataException e) {
-            creator.sendMessage(ChatColor.RED + "Failed to copy dungeon selection! See console...");
+            Set<CoordXZ> keptChunks = new HashSet<>();
+            Set<Vector2D> chunks = selection.getRegionSelector().getRegion().getChunks();
+            for (Vector2D vector2D : chunks) {
+                keptChunks.add(new CoordXZ(vector2D.getBlockX(), vector2D.getBlockZ()));
+            }
+            World world = Bukkit.createWorld(new DungeonWorldCreator(dungeon.getTemplateWorld().getName()).copy(creator.getWorld()));
+            // now we need to trim the freshly generated world down to the selection
+            long ticks = TimeUtil.secondsToTicks(plugin.getConfig().trimFrequency);
+            WorldTrimTask task = new WorldTrimTask(plugin.getServer(), creator, world, keptChunks);
+            BukkitTask bukkitTask = plugin.getServer().getScheduler().runTaskTimer(plugin, task, ticks, ticks);
+            task.setTaskID(bukkitTask.getTaskId());
+        } catch (IncompleteRegionException e) {
             plugin.getLogger().warning(e.getMessage());
         }
         // add the dungeon to the cache

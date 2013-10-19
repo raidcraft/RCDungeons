@@ -1,6 +1,7 @@
 package de.raidcraft.dungeons.api;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.List;
 
@@ -74,6 +75,8 @@ public interface Dungeon {
      * @param locked state of the dungeon
      */
     public void setLocked(boolean locked);
+
+    public World getTemplateWorld();
 
     /**
      * Gets a list of active instaces of this dungeon.

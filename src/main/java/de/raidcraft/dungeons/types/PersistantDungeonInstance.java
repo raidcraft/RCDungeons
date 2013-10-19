@@ -26,7 +26,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
         super(instance.getId(), dungeon);
         this.creationTime = instance.getCreationTime();
-        this.world = dungeon.getName() + instance.getId();
+        this.world = RaidCraft.getComponent(DungeonsPlugin.class).getConfig().dungeonInstancePrefix + dungeon.getName() + "_" + instance.getId();
         setLocked(instance.isLocked());
         setCompleted(instance.isCompleted());
         setActive(instance.isActive());
@@ -45,7 +45,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     @Override
     public World loadWorld() {
 
-        return Bukkit.getServer().createWorld(new DungeonWorldCreator(this.world, this));
+        return Bukkit.getServer().createWorld(new DungeonWorldCreator(this.world).copy(getDungeon().getTemplateWorld()));
     }
 
     @Override

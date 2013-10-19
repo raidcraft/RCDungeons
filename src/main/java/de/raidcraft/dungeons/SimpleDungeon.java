@@ -4,10 +4,13 @@ import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.api.AbstractDungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
+import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +21,13 @@ import java.util.List;
 public class SimpleDungeon extends AbstractDungeon {
 
     private final List<DungeonInstance> instances = new ArrayList<>();
+    private final World templateWorld;
 
     public SimpleDungeon(TDungeon dungeon) {
 
         super(dungeon.getId(), dungeon.getName());
+        this.templateWorld = Bukkit.createWorld(new DungeonWorldCreator(RaidCraft.getComponent(DungeonsPlugin.class).getConfig()
+                .dungeonTemplatePrefix + getName()));
         setFriendlyName(dungeon.getFriendlyName());
         setDescription(dungeon.getDescription());
         setResetTimeMillis(dungeon.getResetTimeMillis());
@@ -37,6 +43,12 @@ public class SimpleDungeon extends AbstractDungeon {
                 instances.add(new PersistantDungeonInstance(instance, this));
             }
         }
+    }
+
+    @Override
+    public World getTemplateWorld() {
+
+        return templateWorld;
     }
 
     @Override

@@ -25,6 +25,9 @@ public class TDungeonSpawn {
     private float spawnYaw;
     private float spawnPitch;
 
+    public TDungeonSpawn() {
+    }
+
     public TDungeonSpawn(Location location) {
 
         this.spawnX = location.getX();

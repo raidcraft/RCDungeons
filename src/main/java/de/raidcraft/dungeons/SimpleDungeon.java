@@ -30,9 +30,12 @@ public class SimpleDungeon extends AbstractDungeon {
             setSpawnLocation(dungeon.getSpawns().get(0).getLocation());
         }
         // lets load all instances that are registered with this dungeon
-        for (TDungeonInstance instance : dungeon.getInstances()) {
-            // create persistant instances for now, may change later
-            instances.add(new PersistantDungeonInstance(instance, this));
+        List<TDungeonInstance> dungeonInstances = dungeon.getInstances();
+        if (dungeonInstances != null) {
+            for (TDungeonInstance instance : dungeonInstances) {
+                // create persistant instances for now, may change later
+                instances.add(new PersistantDungeonInstance(instance, this));
+            }
         }
     }
 

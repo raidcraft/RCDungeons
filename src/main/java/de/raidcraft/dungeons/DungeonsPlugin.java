@@ -33,6 +33,7 @@ public class DungeonsPlugin extends BasePlugin {
         this.dungeonManager = new DungeonManager(this);
         this.copyManager = new CopyManager(this);
         this.config = configure(new LocalConfiguration(this), true);
+        registerCommands(BaseCommands.class);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class DungeonsPlugin extends BasePlugin {
         public double default_reset_time = 86400.0;
     }
 
-    public class BaseCommands {
+    public static class BaseCommands {
 
         private final DungeonsPlugin plugin;
 

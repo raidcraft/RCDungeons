@@ -8,13 +8,14 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Silthus
  */
 @Entity
-@Table(name = "rcdungeons_dungeons")
+@Table(name = "dungeons_dungeons")
 public class TDungeon {
 
     @Id
@@ -28,10 +29,10 @@ public class TDungeon {
     private boolean locked;
     @OneToMany
     @JoinColumn(name = "dungeon_id")
-    private List<TDungeonSpawn> spawns;
+    private List<TDungeonSpawn> spawns = new ArrayList<>();
     @OneToMany
     @JoinColumn(name = "dungeon_id")
-    private List<TDungeonInstance> instances;
+    private List<TDungeonInstance> instances = new ArrayList<>();
 
     public int getId() {
 

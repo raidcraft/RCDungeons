@@ -5,6 +5,7 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import de.raidcraft.api.RaidCraftException;
+import de.raidcraft.dungeons.DungeonException;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
@@ -59,12 +60,17 @@ public class AdminCommands {
             min = 1,
             usage = "<name>"
     )
-    public void test(CommandContext args, CommandSender sender) {
+    @CommandPermissions("rcdungeons.test")
+    public void test(CommandContext args, CommandSender sender) throws CommandException {
 
-        Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
-        DungeonPlayer player = plugin.getDungeonManager().getPlayer((Player) sender);
-        DungeonInstance instance = dungeon.createInstance(player.getName());
-        instance.teleport(player);
-        sender.sendMessage("Created dungeon test instance with the id " + instance.getId());
+        try {
+            Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
+            DungeonPlayer player = plugin.getDungeonManager().getPlayer((Player) sender);
+            DungeonInstance instance = dungeon.createInstance(player.getName());
+            instance.teleport(player);
+            sender.sendMessage("Created dungeon test instance with the id " + instance.getId());
+        } catch (DungeonException e) {
+            throw new CommandException(e.getMessage());
+        }
     }
 }

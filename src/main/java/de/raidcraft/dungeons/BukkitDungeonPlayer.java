@@ -28,15 +28,19 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
 
     public BukkitDungeonPlayer(TDungeonPlayer player) {
 
-        super(player.getId(), player.getName());
+        super(player.getId(), player.getPlayer());
         setLastPosition(player.getLastPosition());
         DungeonManager dungeonManager = RaidCraft.getComponent(DungeonManager.class);
         for (TDungeonInstancePlayer instance : player.getInstances()) {
-            PersistantDungeonInstance dungeonInstance =
-                    new PersistantDungeonInstance(instance.getInstance(), dungeonManager.getDungeon(instance.getInstance().getDungeon().getName()));
-            instances.put(dungeonInstance.getDungeon(), dungeonInstance);
-            if (dungeonInstance.isActive()) {
-                activeInstance = dungeonInstance;
+            try {
+                PersistantDungeonInstance dungeonInstance =
+                        new PersistantDungeonInstance(instance.getInstance(), dungeonManager.getDungeon(instance.getInstance().getDungeon().getName()));
+                instances.put(dungeonInstance.getDungeon(), dungeonInstance);
+                if (dungeonInstance.isActive()) {
+                    activeInstance = dungeonInstance;
+                }
+            } catch (DungeonException e) {
+                RaidCraft.LOGGER.warning(e.getMessage());
             }
         }
     }

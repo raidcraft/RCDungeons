@@ -5,6 +5,7 @@ import com.sk89q.worldedit.bukkit.BukkitUtil;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import com.sk89q.worldedit.data.DataException;
+import de.raidcraft.RaidCraft;
 import de.raidcraft.api.Component;
 import de.raidcraft.api.RaidCraftException;
 import de.raidcraft.api.player.UnknownPlayerException;
@@ -19,14 +20,17 @@ import de.raidcraft.dungeons.types.PersistantDungeonInstance;
 import de.raidcraft.dungeons.worldedit.MCEditCuboidCopy;
 import de.raidcraft.util.CaseInsensitiveMap;
 import de.raidcraft.util.TimeUtil;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,9 +46,11 @@ public class DungeonManager implements Component {
     protected DungeonManager(DungeonsPlugin plugin) {
 
         this.plugin = plugin;
+        RaidCraft.registerComponent(DungeonManager.class, this);
         Plugin wePlugin = Bukkit.getPluginManager().getPlugin("WorldEdit");
         if (wePlugin != null) {
             this.worldEdit = (WorldEditPlugin) wePlugin;
+            load();
         } else {
             plugin.getLogger().warning("Unable to hook worldedit!");
             plugin.disable();
@@ -67,9 +73,24 @@ public class DungeonManager implements Component {
         }
     }
 
-    public Dungeon getDungeon(String name) {
+    public Dungeon getDungeon(String name) throws DungeonException {
 
-        return dungeons.get(name);
+        if (dungeons.containsKey(name)) {
+            return dungeons.get(name);
+        }
+        List<Dungeon> foundDungeons = new ArrayList<>();
+        for (Dungeon dungeon : dungeons.values()) {
+            if (dungeon.getName().startsWith(name) || dungeon.getFriendlyName().toLowerCase().startsWith(name.toLowerCase())) {
+                foundDungeons.add(dungeon);
+            }
+        }
+        if (foundDungeons.isEmpty()) {
+            throw new DungeonException("Did not find a dungeon with the name: " + name);
+        }
+        if (foundDungeons.size() > 1) {
+            throw new DungeonException("Found multiple dungeons with the name " + name + ":" + StringUtils.join(foundDungeons, ", "));
+        }
+        return foundDungeons.get(0);
     }
 
     public Dungeon createDungeon(Player creator, String name, String friendlyName) throws RaidCraftException {
@@ -83,17 +104,13 @@ public class DungeonManager implements Component {
         tDungeon.setLocked(true);
         tDungeon.setFriendlyName(friendlyName);
         tDungeon.setResetTimeMillis(TimeUtil.secondsToMillis(plugin.getConfig().default_reset_time));
-
-        TDungeonSpawn spawn = new TDungeonSpawn(creator.getLocation());
-        plugin.getDatabase().save(spawn);
-        ArrayList<TDungeonSpawn> spawns = new ArrayList<>();
-        spawns.add(spawn);
-        tDungeon.setSpawns(spawns);
-
         plugin.getDatabase().save(tDungeon);
 
-        SimpleDungeon dungeon = new SimpleDungeon(tDungeon);
+        TDungeonSpawn spawn = new TDungeonSpawn(creator.getLocation());
+        spawn.setDungeon(tDungeon);
+        plugin.getDatabase().save(spawn);
 
+        SimpleDungeon dungeon = new SimpleDungeon(tDungeon);
         try {
             // then copy the player selection and save it as the dungeon template
             Selection selection = worldEdit.getSelection(creator);
@@ -107,6 +124,8 @@ public class DungeonManager implements Component {
             creator.sendMessage(ChatColor.RED + "Failed to copy dungeon selection! See console...");
             plugin.getLogger().warning(e.getMessage());
         }
+        // add the dungeon to the cache
+        dungeons.put(dungeon.getName(), dungeon);
         return dungeon;
     }
 
@@ -146,7 +165,14 @@ public class DungeonManager implements Component {
                 throw new UnknownPlayerException("The player " + player + " is not online and does not exist in the database!");
             } else if (bukkitPlayer != null && tDungeonPlayer == null) {
                 tDungeonPlayer = new TDungeonPlayer();
-                tDungeonPlayer.setName(player);
+                tDungeonPlayer.setPlayer(player);
+                Location location = bukkitPlayer.getLocation();
+                tDungeonPlayer.setLastWorld(location.getWorld().getName());
+                tDungeonPlayer.setLastX(location.getX());
+                tDungeonPlayer.setLastY(location.getY());
+                tDungeonPlayer.setLastZ(location.getZ());
+                tDungeonPlayer.setLastPitch(location.getPitch());
+                tDungeonPlayer.setLastYaw(location.getYaw());
                 plugin.getDatabase().save(tDungeonPlayer);
             }
             BukkitDungeonPlayer dungeonPlayer = new BukkitDungeonPlayer(tDungeonPlayer);

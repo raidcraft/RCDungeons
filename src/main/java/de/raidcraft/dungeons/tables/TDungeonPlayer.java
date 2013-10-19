@@ -9,32 +9,36 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Silthus
  */
 @Entity
-@Table(name = "rcdungeons_dungeon_players")
+@Table(name = "dungeons_dungeon_players")
 public class TDungeonPlayer {
 
     @Id
     private int id;
     @NotNull
-    private String name;
+    private String player;
     private String lastWorld;
     private double lastX;
     private double lastY;
     private double lastZ;
-    private long lastYaw;
-    private long lastPitch;
+    private float lastYaw;
+    private float lastPitch;
     @OneToMany
     @JoinColumn(name = "player_id")
-    private List<TDungeonInstancePlayer> instances;
+    private List<TDungeonInstancePlayer> instances = new ArrayList<>();
 
 
     public Location getLastPosition() {
 
+        if (lastWorld == null) {
+            return null;
+        }
         return new Location(Bukkit.getWorld(lastWorld), lastX, lastY, lastZ, lastYaw, lastPitch);
     }
 
@@ -48,14 +52,14 @@ public class TDungeonPlayer {
         this.id = id;
     }
 
-    public String getName() {
+    public String getPlayer() {
 
-        return name;
+        return player;
     }
 
-    public void setName(String name) {
+    public void setPlayer(String player) {
 
-        this.name = name;
+        this.player = player;
     }
 
     public String getLastWorld() {
@@ -98,22 +102,22 @@ public class TDungeonPlayer {
         this.lastZ = lastZ;
     }
 
-    public long getLastYaw() {
+    public float getLastYaw() {
 
         return lastYaw;
     }
 
-    public void setLastYaw(long lastYaw) {
+    public void setLastYaw(float lastYaw) {
 
         this.lastYaw = lastYaw;
     }
 
-    public long getLastPitch() {
+    public float getLastPitch() {
 
         return lastPitch;
     }
 
-    public void setLastPitch(long lastPitch) {
+    public void setLastPitch(float lastPitch) {
 
         this.lastPitch = lastPitch;
     }

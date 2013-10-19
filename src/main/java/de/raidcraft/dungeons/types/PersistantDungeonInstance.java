@@ -9,6 +9,7 @@ import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
+import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.Bukkit;
@@ -78,10 +79,17 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
         instance.setActive(isActive());
         instance.setCompleted(isCompleted());
         instance.setLocked(isLocked());
+        database.save(instance);
         for (DungeonPlayer player : getPlayers()) {
             player.save();
-            instance.getPlayers().add(database.find(TDungeonPlayer.class, player.getId()));
+            TDungeonInstancePlayer tDungeonPlayer = database.find(TDungeonInstancePlayer.class)
+                    .where().eq("instance_id", getId()).eq("player_id", player.getId()).findUnique();
+            if (tDungeonPlayer == null) {
+                tDungeonPlayer = new TDungeonInstancePlayer();
+                tDungeonPlayer.setInstance(instance);
+                tDungeonPlayer.setPlayer(database.find(TDungeonPlayer.class, player.getId()));
+                database.save(tDungeonPlayer);
+            }
         }
-        database.update(instance);
     }
 }

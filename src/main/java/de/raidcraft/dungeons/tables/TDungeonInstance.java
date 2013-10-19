@@ -2,7 +2,6 @@ package de.raidcraft.dungeons.tables;
 
 import com.avaje.ebean.validation.NotNull;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -10,13 +9,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Silthus
  */
 @Entity
-@Table(name = "rcdungeons_dungeon_instances")
+@Table(name = "dungeons_dungeon_instances")
 public class TDungeonInstance {
 
     @Id
@@ -24,26 +24,13 @@ public class TDungeonInstance {
     @ManyToOne
     private TDungeon dungeon;
     @NotNull
-    @Column(unique = true)
-    private String world;
-    @NotNull
     private Timestamp creationTime;
     private boolean active;
     private boolean completed;
     private boolean locked;
     @OneToMany
     @JoinColumn(name = "dungeon_instance_id")
-    private Set<TDungeonPlayer> players;
-
-    public String getWorld() {
-
-        return world;
-    }
-
-    public void setWorld(String world) {
-
-        this.world = world;
-    }
+    private Set<TDungeonInstancePlayer> players = new HashSet<>();
 
     public boolean isLocked() {
 
@@ -105,12 +92,12 @@ public class TDungeonInstance {
         this.completed = completed;
     }
 
-    public Set<TDungeonPlayer> getPlayers() {
+    public Set<TDungeonInstancePlayer> getPlayers() {
 
         return players;
     }
 
-    public void setPlayers(Set<TDungeonPlayer> players) {
+    public void setPlayers(Set<TDungeonInstancePlayer> players) {
 
         this.players = players;
     }

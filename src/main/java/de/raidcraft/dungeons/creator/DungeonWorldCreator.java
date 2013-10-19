@@ -8,8 +8,14 @@ import de.raidcraft.dungeons.worldedit.CuboidCopy;
 import de.raidcraft.dungeons.worldedit.CuboidCopyException;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
+import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.ChunkGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author Silthus
@@ -26,6 +32,23 @@ public class DungeonWorldCreator extends WorldCreator {
     public DungeonWorldCreator(String name, DungeonInstance instance) {
 
         super(name);
+        generator(new ChunkGenerator() {
+            @Override
+            public List<BlockPopulator> getDefaultPopulators(World world) {
+
+                return new ArrayList<>();
+            }
+
+            @Override
+            public byte[] generate(World world, Random random, int x, int z) {
+
+                int height = world.getMaxHeight();
+                return new byte[256 * height];
+            }
+        });
+        generateStructures(false);
+        environment(World.Environment.NORMAL);
+        type(WorldType.FLAT);
         this.instance = instance;
     }
 

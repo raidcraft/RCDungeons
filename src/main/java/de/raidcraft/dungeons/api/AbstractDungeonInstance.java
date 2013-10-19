@@ -2,6 +2,7 @@ package de.raidcraft.dungeons.api;
 
 import de.raidcraft.util.CaseInsensitiveMap;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
@@ -48,10 +49,12 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public void teleport(DungeonPlayer player) {
 
-        Player bPlayer = Bukkit.getPlayer(player.getName());
-        if (bPlayer != null) {
-            player.setLastPosition(bPlayer.getLocation());
-            bPlayer.teleport(getDungeon().getSpawnLocation());
+        Player bukkitPlayer = Bukkit.getPlayer(player.getName());
+        if (bukkitPlayer != null) {
+            player.setLastPosition(bukkitPlayer.getLocation());
+            Location spawnLocation = getDungeon().getSpawnLocation();
+            spawnLocation.setWorld(getWorld());
+            bukkitPlayer.teleport(spawnLocation);
         }
     }
 

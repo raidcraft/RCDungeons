@@ -1,9 +1,13 @@
 package de.raidcraft.dungeons.creator;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -11,21 +15,26 @@ import java.util.Random;
  */
 public class DungeonWorldCreator extends WorldCreator {
 
-    /**
-     * Creates an empty WorldCreationOptions for the given world name
-     *
-     * @param name Name of the world that will be created
-     */
-    public DungeonWorldCreator(String name) {
+    public DungeonWorldCreator(String name, Location spawn) {
 
         super(name);
         generator(new ChunkGenerator() {
+            @Override
+            public Location getFixedSpawnLocation(World world, Random random) {
+
+                return spawn;
+            }
 
             @Override
-            public byte[] generate(World world, Random random, int x, int z) {
+            public boolean canSpawn(World world, int x, int z) {
 
-                int height = world.getMaxHeight();
-                return new byte[256 * height];
+                return true;
+            }
+
+            @Override
+            public List<BlockPopulator> getDefaultPopulators(World world) {
+
+                return new ArrayList<>();
             }
         });
     }

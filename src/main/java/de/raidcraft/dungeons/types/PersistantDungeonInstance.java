@@ -20,13 +20,13 @@ import org.bukkit.World;
  */
 public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
-    private final String world;
+    private final String worldName;
 
     public PersistantDungeonInstance(TDungeonInstance instance, Dungeon dungeon) {
 
         super(instance.getId(), dungeon);
         this.creationTime = instance.getCreationTime();
-        this.world = RaidCraft.getComponent(DungeonsPlugin.class).getConfig().dungeonInstancePrefix + dungeon.getName() + "_" + instance.getId();
+        this.worldName = RaidCraft.getComponent(DungeonsPlugin.class).getConfig().dungeonInstancePrefix + dungeon.getName() + "_" + instance.getId();
         setLocked(instance.isLocked());
         setCompleted(instance.isCompleted());
         setActive(instance.isActive());
@@ -35,7 +35,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     @Override
     public World getWorld() {
 
-        World world = Bukkit.getWorld(this.world);
+        World world = Bukkit.getWorld(this.worldName);
         if (world == null) {
             world = loadWorld();
         }
@@ -45,7 +45,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     @Override
     public World loadWorld() {
 
-        return Bukkit.getServer().createWorld(new DungeonWorldCreator(this.world).copy(getDungeon().getTemplateWorld()));
+        return Bukkit.createWorld(new DungeonWorldCreator(this.worldName, getDungeon().getSpawnLocation()).copy(getDungeon().getTemplateWorld()));
     }
 
     @Override

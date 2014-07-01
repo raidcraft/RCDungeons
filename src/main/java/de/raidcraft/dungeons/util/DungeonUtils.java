@@ -1,5 +1,7 @@
 package de.raidcraft.dungeons.util;
 
+import de.raidcraft.RaidCraft;
+import de.raidcraft.dungeons.DungeonsPlugin;
 import org.bukkit.World;
 
 import java.io.File;
@@ -26,5 +28,10 @@ public class DungeonUtils {
             }
         }
         return (path.delete());
+    }
+
+    public static String getTemplateWorldName(String name) {
+
+        return RaidCraft.getComponent(DungeonsPlugin.class).getConfig().dungeonTemplatePrefix + name;
     }
 }

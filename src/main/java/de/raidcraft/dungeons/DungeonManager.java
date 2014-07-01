@@ -1,9 +1,15 @@
 package de.raidcraft.dungeons;
 
+import com.sk89q.worldedit.CuboidClipboard;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.BukkitPlayer;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.bukkit.selections.Selection;
+import com.sk89q.worldedit.regions.Region;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.api.Component;
 import de.raidcraft.api.RaidCraftException;
@@ -11,14 +17,13 @@ import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
-import de.raidcraft.dungeons.creator.CoordXZ;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
-import de.raidcraft.dungeons.creator.WorldTrimTask;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
+import de.raidcraft.dungeons.util.DungeonUtils;
 import de.raidcraft.util.CaseInsensitiveMap;
 import de.raidcraft.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
@@ -27,14 +32,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Silthus
@@ -70,7 +72,7 @@ public class DungeonManager implements Component {
     private void load() {
 
         for (TDungeon dungeon : plugin.getDatabase().find(TDungeon.class).findList()) {
-            SimpleDungeon simpleDungeon = new SimpleDungeon(dungeon);
+            SimpleDungeon simpleDungeon = new SimpleDungeon(dungeon, Bukkit.getWorld(DungeonUtils.getTemplateWorldName(dungeon.getName())));
             this.dungeons.put(simpleDungeon.getName(), simpleDungeon);
             plugin.getLogger().info("Loaded dungeon template for: " + simpleDungeon.getName() + " - " + simpleDungeon.getFriendlyName());
         }
@@ -81,12 +83,10 @@ public class DungeonManager implements Component {
         if (dungeons.containsKey(name)) {
             return dungeons.get(name);
         }
-        List<Dungeon> foundDungeons = new ArrayList<>();
-        for (Dungeon dungeon : dungeons.values()) {
-            if (dungeon.getName().startsWith(name) || dungeon.getFriendlyName().toLowerCase().startsWith(name.toLowerCase())) {
-                foundDungeons.add(dungeon);
-            }
-        }
+        List<Dungeon> foundDungeons = dungeons.values().stream()
+                .filter(dungeon -> dungeon.getName().startsWith(name)
+                        || dungeon.getFriendlyName().toLowerCase().startsWith(name.toLowerCase()))
+                .collect(Collectors.toList());
         if (foundDungeons.isEmpty()) {
             throw new DungeonException("Did not find a dungeon with the name: " + name);
         }
@@ -109,32 +109,40 @@ public class DungeonManager implements Component {
         tDungeon.setResetTimeMillis(TimeUtil.secondsToMillis(plugin.getConfig().default_reset_time));
         plugin.getDatabase().save(tDungeon);
 
-        TDungeonSpawn spawn = new TDungeonSpawn(creator.getLocation());
+        Location origin = creator.getLocation();
+        TDungeonSpawn spawn = new TDungeonSpawn(origin);
         spawn.setDungeon(tDungeon);
         plugin.getDatabase().save(spawn);
 
-        SimpleDungeon dungeon = new SimpleDungeon(tDungeon);
+        SimpleDungeon dungeon = new SimpleDungeon(tDungeon, createDungeonWorld(creator, DungeonUtils.getTemplateWorldName(tDungeon.getName())));
+        this.dungeons.put(dungeon.getName(), dungeon);
+        return dungeon;
+    }
+
+    public World createDungeonWorld(Player creator, String worldName) throws RaidCraftException {
 
         try {
             // then copy the player selection and save it as the dungeon template
-            Selection selection = worldEdit.getSelection(creator);
-            Set<CoordXZ> keptChunks = new HashSet<>();
-            Set<Vector2D> chunks = selection.getRegionSelector().getRegion().getChunks();
-            for (Vector2D vector2D : chunks) {
-                keptChunks.add(new CoordXZ(vector2D.getBlockX(), vector2D.getBlockZ()));
-            }
-            World world = Bukkit.createWorld(new DungeonWorldCreator(dungeon.getTemplateWorld().getName()).copy(creator.getWorld()));
-            // now we need to trim the freshly generated world down to the selection
-            long ticks = TimeUtil.secondsToTicks(plugin.getConfig().trimFrequency);
-            WorldTrimTask task = new WorldTrimTask(plugin.getServer(), creator, world, keptChunks);
-            BukkitTask bukkitTask = plugin.getServer().getScheduler().runTaskTimer(plugin, task, ticks, ticks);
-            task.setTaskID(bukkitTask.getTaskId());
-        } catch (IncompleteRegionException e) {
-            plugin.getLogger().warning(e.getMessage());
+            LocalSession session = worldEdit.getSession(creator);
+            Region region = session.getSelection(session.getSelectionWorld());
+            World world = Bukkit.createWorld(new DungeonWorldCreator(worldName, creator.getLocation()));
+
+            EditSession editSession = worldEdit.getWorldEdit().getEditSessionFactory()
+                    .getEditSession((com.sk89q.worldedit.world.World) new BukkitWorld(world), region.getHeight() * region.getLength() * region.getWidth() * 2);
+            Vector min = region.getMinimumPoint();
+            Vector max = region.getMaximumPoint();
+            Vector pos = session.getPlacementPosition(new BukkitPlayer(worldEdit, worldEdit.getServerInterface(), creator));
+
+            CuboidClipboard clipboard = new CuboidClipboard(
+                    max.subtract(min).add(Vector.ONE),
+                    min, min.subtract(pos));
+
+            clipboard.place(editSession, clipboard.getOrigin(), false);
+
+            return world;
+        } catch (IncompleteRegionException | MaxChangedBlocksException e) {
+            throw new RaidCraftException(e);
         }
-        // add the dungeon to the cache
-        dungeons.put(dungeon.getName(), dungeon);
-        return dungeon;
     }
 
     public DungeonInstance createDungeonInstance(Dungeon dungeon, String... players) {

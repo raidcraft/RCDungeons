@@ -4,16 +4,16 @@ import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.api.AbstractDungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
-import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
-import org.bukkit.Bukkit;
+import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Silthus
@@ -23,11 +23,10 @@ public class SimpleDungeon extends AbstractDungeon {
     private final List<DungeonInstance> instances = new ArrayList<>();
     private final World templateWorld;
 
-    public SimpleDungeon(TDungeon dungeon) {
+    public SimpleDungeon(TDungeon dungeon, World templateWorld) {
 
         super(dungeon.getId(), dungeon.getName());
-        this.templateWorld = Bukkit.createWorld(new DungeonWorldCreator(RaidCraft.getComponent(DungeonsPlugin.class).getConfig()
-                .dungeonTemplatePrefix + getName()));
+        this.templateWorld = templateWorld;
         setFriendlyName(dungeon.getFriendlyName());
         setDescription(dungeon.getDescription());
         setResetTimeMillis(dungeon.getResetTimeMillis());
@@ -38,10 +37,10 @@ public class SimpleDungeon extends AbstractDungeon {
         // lets load all instances that are registered with this dungeon
         List<TDungeonInstance> dungeonInstances = dungeon.getInstances();
         if (dungeonInstances != null) {
-            for (TDungeonInstance instance : dungeonInstances) {
-                // create persistant instances for now, may change later
-                instances.add(new PersistantDungeonInstance(instance, this));
-            }
+            // create persistant instances for now, may change later
+            instances.addAll(dungeonInstances.stream()
+                    .map(instance -> new PersistantDungeonInstance(instance, this))
+                    .collect(Collectors.toList()));
         }
     }
 
@@ -68,13 +67,9 @@ public class SimpleDungeon extends AbstractDungeon {
     @Override
     public List<DungeonInstance> getActiveInstances() {
 
-        List<DungeonInstance> instances = new ArrayList<>();
-        for (DungeonInstance instance : this.instances) {
-            if (instance.isActive()) {
-                instances.add(instance);
-            }
-        }
-        return instances;
+        return this.instances.stream()
+                .filter(DungeonInstance::isActive)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -19,10 +19,15 @@ public class DungeonWorldCreator extends WorldCreator {
 
         super(name);
         generator(new ChunkGenerator() {
+            private Location newSpawn;
+
             @Override
             public Location getFixedSpawnLocation(World world, Random random) {
 
-                return spawn;
+                if (newSpawn == null) {
+                    newSpawn = new Location(world, spawn.getX(), spawn.getY(), spawn.getZ());
+                }
+                return newSpawn;
             }
 
             @Override

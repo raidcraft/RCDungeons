@@ -12,8 +12,13 @@ import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.util.DungeonUtils;
+import net.minecraft.util.org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Silthus
@@ -44,8 +49,40 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
     @Override
     public World loadWorld() {
+        // if template, copy it
 
-        return Bukkit.createWorld(new DungeonWorldCreator(this.worldName, getDungeon().getSpawnLocation()).copy(getDungeon().getTemplateWorld()));
+        Location spawn = getDungeon().getSpawnLocation();
+        DungeonWorldCreator creator = new DungeonWorldCreator(this.worldName, spawn);
+        // copy template world
+        copy(DungeonUtils.getTemplateWorldName(getDungeon().getName()), this.worldName);
+        //        World template = getDungeon().getTemplateWorld();
+        // load template World if not loaded
+        //        if (template == null) {
+        //            template = Bukkit.createWorld(new DungeonWorldCreator(worldName, getDungeon().getSpawnLocation()));
+        //            getDungeon().setTemplateWorld(template);
+        //        }
+        //        WorldCreator wc = creator.copy(template);
+
+        World w = Bukkit.createWorld(creator);
+        return w;
+    }
+
+    public void copy(String template, String target) {
+
+        try {
+            DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
+            File src = new File(Bukkit.getWorldContainer() + File.separator + template);
+            File dest = new File(Bukkit.getWorldContainer() + File.separator + target);
+            if (dest.exists()) {
+                RaidCraft.LOGGER.info("try to copy existing world: " + target);
+                return;
+            }
+            FileUtils.copyDirectory(src, dest);
+            // delete data files
+            FileUtils.forceDelete(new File(dest.getAbsoluteFile() + File.separator + "uid.dat"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

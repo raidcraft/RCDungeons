@@ -8,6 +8,7 @@ import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
+import lombok.Setter;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -20,10 +21,10 @@ import java.util.stream.Collectors;
 public class SimpleDungeon extends AbstractDungeon {
 
     private final List<DungeonInstance> instances = new ArrayList<>();
-    private final World templateWorld;
+    @Setter
+    private World templateWorld;
 
     public SimpleDungeon(TDungeon dungeon, World templateWorld) {
-
         super(dungeon.getId(), dungeon.getName());
         this.templateWorld = templateWorld;
         setFriendlyName(dungeon.getFriendlyName());

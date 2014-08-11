@@ -107,6 +107,9 @@ public class DungeonManager implements Component {
         plugin.getDatabase().save(spawn);
 
         SimpleDungeon dungeon = new SimpleDungeon(tDungeon, createDungeonWorld(creator, DungeonUtils.getTemplateWorldName(tDungeon.getName())));
+        Location loc = creator.getLocation();
+        loc.setWorld(dungeon.getTemplateWorld());
+        dungeon.setSpawnLocation(loc);
         this.dungeons.put(dungeon.getName(), dungeon);
         return dungeon;
     }
@@ -125,6 +128,9 @@ public class DungeonManager implements Component {
         creator.performCommand("/copy");
         creator.teleport(loc);
         creator.performCommand("/paste");
+
+        // save world
+        world.save();
         return world;
     }
 

@@ -78,6 +78,8 @@ public interface Dungeon {
 
     public World getTemplateWorld();
 
+    public void setTemplateWorld(World templateWorld);
+
     /**
      * Gets a list of active instaces of this dungeon.
      *

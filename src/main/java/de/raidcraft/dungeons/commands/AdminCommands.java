@@ -17,13 +17,12 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import de.raidcraft.api.RaidCraftException;
 import de.raidcraft.dungeons.DungeonException;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
-import de.raidcraft.dungeons.util.DungeonUtils;
+import de.raidcraft.util.UUIDUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -64,12 +63,7 @@ public class AdminCommands {
     @CommandPermissions("rcdungeons.create")
     public void create(CommandContext args, CommandSender sender) throws CommandException {
 
-        try {
-            Dungeon dungeon = plugin.getDungeonManager().createDungeon((Player) sender, args.getString(0), args.getJoinedStrings(1));
-            sender.sendMessage(ChatColor.GREEN + "Created dungeon " + dungeon.getFriendlyName() + " successfully!");
-        } catch (RaidCraftException e) {
-            throw new CommandException(e);
-        }
+        plugin.create((Player) sender, args.getString(0), args.getString(1));
     }
 
     @Command(
@@ -103,17 +97,7 @@ public class AdminCommands {
     @CommandPermissions("rcdungeons.edit")
     public void edit(CommandContext args, CommandSender sender) throws CommandException {
 
-        try {
-            Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
-            Player player = (Player) sender;
-            World w = plugin.getDungeonManager().createDungeonWorld(player, DungeonUtils.getTemplateWorldName(dungeon.getName()));
-            Location location = player.getLocation();
-            location.setWorld(w);
-            player.teleport(location);
-
-        } catch (RaidCraftException e) {
-            throw new CommandException(e.getMessage());
-        }
+        plugin.edit((Player) sender, args.getString(0));
     }
 
     @Command(
@@ -193,5 +177,31 @@ public class AdminCommands {
         } catch (DungeonException e) {
             throw new CommandException(e.getMessage());
         }
+    }
+
+    @Command(
+            aliases = {"start"},
+            desc = "Starts the Quest Creation Wizard",
+            min = 1,
+            usage = "<dungeon_name> <players...>"
+    )
+    @CommandPermissions("rcdungeons.start")
+    public void start(CommandContext args, CommandSender sender) {
+
+        Player player = (args.argsLength() == 2) ? Bukkit.getPlayer(UUIDUtil.convertPlayer(args.getString(1))) : (Player) sender;
+        Bukkit.broadcastMessage("start " + args.getString(0) + ": " + args.getString(1));
+    }
+
+    @Command(
+            aliases = {"save"},
+            desc = "Save you current world"
+    )
+    @CommandPermissions("rcdungeons.save")
+    public void save(CommandContext args, CommandSender sender) throws CommandException {
+
+        if (!(sender instanceof Player)) {
+            throw new CommandException("Playercommand");
+        }
+        ((Player) sender).getWorld().save();
     }
 }

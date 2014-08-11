@@ -88,6 +88,21 @@ public class DungeonManager implements Component {
         return foundDungeons.get(0);
     }
 
+    public World getWorld(String dungeonName) throws DungeonException {
+        String worldName = DungeonUtils.getTemplateWorldName(dungeonName);
+        World world = Bukkit.getWorld(worldName);
+        if(world != null) {
+            return world;
+        }
+        Dungeon dungeon = getDungeon(dungeonName);
+        Location spawn = dungeon.getSpawnLocation();
+        world = Bukkit.createWorld(new DungeonWorldCreator(worldName, dungeon.getSpawnLocation()));
+        // TODO: remove hoftix spawn
+        world.setSpawnLocation(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ());
+        dungeon.setTemplateWorld(world);
+        return world;
+    }
+
     public Dungeon createDungeon(Player creator, String name, String friendlyName) throws RaidCraftException {
 
         if (dungeons.containsKey(name)) {

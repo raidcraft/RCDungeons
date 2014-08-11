@@ -4,15 +4,19 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.NestedCommand;
 import de.raidcraft.api.BasePlugin;
+import de.raidcraft.api.RaidCraftException;
 import de.raidcraft.api.config.ConfigurationBase;
 import de.raidcraft.api.config.Setting;
+import de.raidcraft.dungeons.api.DungeonAPI;
 import de.raidcraft.dungeons.commands.AdminCommands;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +24,7 @@ import java.util.List;
 /**
  * @author Silthus
  */
-public class DungeonsPlugin extends BasePlugin {
+public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
     private DungeonManager dungeonManager;
     private LocalConfiguration config;
@@ -102,5 +106,36 @@ public class DungeonsPlugin extends BasePlugin {
 
 
         }
+    }
+
+    @Override
+    public void create(Player creator, String dungeonName, String friendlyName) {
+
+        try {
+            dungeonManager.createDungeon(creator, dungeonName, friendlyName);
+        } catch (RaidCraftException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void edit(Player player, String dungeonName) {
+
+        try {
+            World w = dungeonManager.getWorld(dungeonName);
+            player.teleport(w.getSpawnLocation());
+        } catch (RaidCraftException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void start(String dungeonName, Player player, int radius) {
+        //TODO: implement
+    }
+
+    @Override
+    public void end(String instanceWorldName) {
+        //TODO: implement
     }
 }

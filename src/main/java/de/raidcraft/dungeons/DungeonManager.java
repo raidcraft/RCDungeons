@@ -1,15 +1,6 @@
 package de.raidcraft.dungeons;
 
-import com.sk89q.worldedit.CuboidClipboard;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.IncompleteRegionException;
-import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.bukkit.BukkitPlayer;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
-import com.sk89q.worldedit.regions.Region;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.api.Component;
 import de.raidcraft.api.RaidCraftException;
@@ -28,6 +19,7 @@ import de.raidcraft.util.CaseInsensitiveMap;
 import de.raidcraft.util.TimeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -120,29 +112,20 @@ public class DungeonManager implements Component {
     }
 
     public World createDungeonWorld(Player creator, String worldName) throws RaidCraftException {
+        // create empty world
+        World world = Bukkit.createWorld(new DungeonWorldCreator(worldName, creator.getLocation()));
 
-        try {
-            // then copy the player selection and save it as the dungeon template
-            LocalSession session = worldEdit.getSession(creator);
-            Region region = session.getSelection(session.getSelectionWorld());
-            World world = Bukkit.createWorld(new DungeonWorldCreator(worldName, creator.getLocation()));
+        // switch creator to flying mode that he don't die
+        creator.sendMessage("Create dungeon ... don't move !!!");
+        creator.setGameMode(GameMode.CREATIVE);
+        creator.setFlying(true);
 
-            EditSession editSession = worldEdit.getWorldEdit().getEditSessionFactory()
-                    .getEditSession((com.sk89q.worldedit.world.World) new BukkitWorld(world), region.getHeight() * region.getLength() * region.getWidth() * 2);
-            Vector min = region.getMinimumPoint();
-            Vector max = region.getMaximumPoint();
-            Vector pos = session.getPlacementPosition(new BukkitPlayer(worldEdit, worldEdit.getServerInterface(), creator));
-
-            CuboidClipboard clipboard = new CuboidClipboard(
-                    max.subtract(min).add(Vector.ONE),
-                    min, min.subtract(pos));
-
-            clipboard.place(editSession, clipboard.getOrigin(), false);
-
-            return world;
-        } catch (IncompleteRegionException | MaxChangedBlocksException e) {
-            throw new RaidCraftException(e);
-        }
+        Location loc = creator.getLocation();
+        loc.setWorld(world);
+        creator.performCommand("/copy");
+        creator.teleport(loc);
+        creator.performCommand("/paste");
+        return world;
     }
 
     public DungeonInstance createDungeonInstance(Dungeon dungeon, String... players) {

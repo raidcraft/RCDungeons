@@ -8,7 +8,6 @@ import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
-import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -38,9 +37,9 @@ public class SimpleDungeon extends AbstractDungeon {
         List<TDungeonInstance> dungeonInstances = dungeon.getInstances();
         if (dungeonInstances != null) {
             // create persistant instances for now, may change later
-            instances.addAll(dungeonInstances.stream()
-                    .map(instance -> new PersistantDungeonInstance(instance, this))
-                    .collect(Collectors.toList()));
+            for (TDungeonInstance instance : dungeonInstances) {
+                instances.add(new PersistantDungeonInstance(instance, this));
+            }
         }
     }
 
@@ -53,7 +52,7 @@ public class SimpleDungeon extends AbstractDungeon {
     @Override
     public DungeonInstance createInstance(String... players) {
 
-        DungeonInstance instance  = RaidCraft.getComponent(DungeonManager.class).createDungeonInstance(this, players);
+        DungeonInstance instance = RaidCraft.getComponent(DungeonManager.class).createDungeonInstance(this, players);
         instances.add(instance);
         return instance;
     }

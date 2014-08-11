@@ -23,6 +23,7 @@ import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
+import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -82,10 +83,14 @@ public class AdminCommands {
         Player player = (Player) sender;
         Location loc = player.getLocation();
         String worldName = "world";
-        if (args.argsLength() > 1) {
+        if (args.argsLength() >= 1) {
             worldName = args.getJoinedStrings(0);
         }
-        loc.setWorld(Bukkit.getWorld(worldName));
+        World w = Bukkit.getWorld(worldName);
+        if (w == null) {
+            throw new CommandException("World (" + worldName + ") not exists.");
+        }
+        loc.setWorld(w);
         player.teleport(loc);
     }
 
@@ -101,7 +106,7 @@ public class AdminCommands {
         try {
             Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
             Player player = (Player) sender;
-            World w = plugin.getDungeonManager().createDungeonWorld(player, dungeon.getName());
+            World w = plugin.getDungeonManager().createDungeonWorld(player, DungeonUtils.getTemplateWorldName(dungeon.getName()));
             Location location = player.getLocation();
             location.setWorld(w);
             player.teleport(location);

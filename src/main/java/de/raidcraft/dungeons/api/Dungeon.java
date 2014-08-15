@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Silthus
@@ -98,18 +99,20 @@ public interface Dungeon {
      * Creates a new instance of the dungeon for the given party.
      *
      * @param players that are entering the dungeon, most likely the party
+     *
      * @return created dungeon instance
      */
-    public DungeonInstance createInstance(String... players);
+    public DungeonInstance createInstance(UUID... players);
 
     /**
      * Tries to get an instance of the dungeon for the given player.
      * If the player has no active instance of the dungeon it will create a new one.
      *
      * @param player to get instance for
+     *
      * @return new or existing dungeon instance
      */
-    public DungeonInstance getActiveInstance(String player);
+    public DungeonInstance getActiveInstance(UUID player);
 
     public void save();
 }

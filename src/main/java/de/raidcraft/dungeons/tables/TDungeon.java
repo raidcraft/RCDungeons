@@ -1,6 +1,8 @@
 package de.raidcraft.dungeons.tables;
 
 import com.avaje.ebean.validation.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +16,8 @@ import java.util.List;
 /**
  * @author Silthus
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "dungeons_dungeons")
 public class TDungeon {
@@ -33,84 +37,4 @@ public class TDungeon {
     @OneToMany
     @JoinColumn(name = "dungeon_id")
     private List<TDungeonInstance> instances = new ArrayList<>();
-
-    public int getId() {
-
-        return id;
-    }
-
-    public void setId(int id) {
-
-        this.id = id;
-    }
-
-    public String getName() {
-
-        return name;
-    }
-
-    public void setName(String name) {
-
-        this.name = name;
-    }
-
-    public String getFriendlyName() {
-
-        return friendlyName;
-    }
-
-    public void setFriendlyName(String friendlyName) {
-
-        this.friendlyName = friendlyName;
-    }
-
-    public String getDescription() {
-
-        return description;
-    }
-
-    public void setDescription(String description) {
-
-        this.description = description;
-    }
-
-    public long getResetTimeMillis() {
-
-        return resetTimeMillis;
-    }
-
-    public void setResetTimeMillis(long resetTimeMillis) {
-
-        this.resetTimeMillis = resetTimeMillis;
-    }
-
-    public boolean isLocked() {
-
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-
-        this.locked = locked;
-    }
-
-    public List<TDungeonSpawn> getSpawns() {
-
-        return spawns;
-    }
-
-    public void setSpawns(List<TDungeonSpawn> spawns) {
-
-        this.spawns = spawns;
-    }
-
-    public List<TDungeonInstance> getInstances() {
-
-        return instances;
-    }
-
-    public void setInstances(List<TDungeonInstance> instances) {
-
-        this.instances = instances;
-    }
 }

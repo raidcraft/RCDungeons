@@ -4,6 +4,7 @@ import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.api.AbstractDungeonPlayer;
 import de.raidcraft.dungeons.api.Dungeon;
+import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
@@ -28,7 +29,7 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
 
     public BukkitDungeonPlayer(TDungeonPlayer player) {
 
-        super(player.getId(), player.getPlayer());
+        super(player.getId(), player.getPlayerId());
         setLastPosition(player.getLastPosition());
         DungeonManager dungeonManager = RaidCraft.getComponent(DungeonManager.class);
         for (TDungeonInstancePlayer instance : player.getInstances()) {
@@ -67,7 +68,7 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
     public void leaveActiveDungeon(DungeonReason reason) {
 
         if (getActiveInstance() != null) {
-            Player player = Bukkit.getPlayer(getName());
+            Player player = Bukkit.getPlayer(getPlayerId());
             if (player != null) {
                 player.teleport(getLastPosition());
             }

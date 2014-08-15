@@ -6,6 +6,7 @@ import de.raidcraft.api.Component;
 import de.raidcraft.api.RaidCraftException;
 import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.Dungeon;
+import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
@@ -26,8 +27,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +40,7 @@ public class DungeonManager implements Component {
 
     private final DungeonsPlugin plugin;
     private final Map<String, Dungeon> dungeons = new CaseInsensitiveMap<>();
-    private final Map<String, DungeonPlayer> players = new CaseInsensitiveMap<>();
+    private final Map<UUID, DungeonPlayer> players = new HashMap<>();
     private WorldEditPlugin worldEdit;
 
     protected DungeonManager(DungeonsPlugin plugin) {
@@ -89,9 +92,10 @@ public class DungeonManager implements Component {
     }
 
     public World getWorld(String dungeonName) throws DungeonException {
+
         String worldName = DungeonUtils.getTemplateWorldName(dungeonName);
         World world = Bukkit.getWorld(worldName);
-        if(world != null) {
+        if (world != null) {
             return world;
         }
         Dungeon dungeon = getDungeon(dungeonName);
@@ -149,7 +153,7 @@ public class DungeonManager implements Component {
         return world;
     }
 
-    public DungeonInstance createDungeonInstance(Dungeon dungeon, String... players) {
+    public DungeonInstance createDungeonInstance(Dungeon dungeon, UUID... players) {
 
         // prepare an initial table entry to provide a valid id to the new dungeon instance
         TDungeonInstance tableEntry = new TDungeonInstance();
@@ -161,9 +165,9 @@ public class DungeonManager implements Component {
         plugin.getDatabase().save(tableEntry);
         // now we have our id we can create the actual dungeon instance
         DungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
-        for (String player : players) {
+        for (UUID playerId : players) {
             try {
-                instance.addPlayer(getPlayer(player));
+                instance.addPlayer(getPlayer(playerId));
             } catch (UnknownPlayerException e) {
                 plugin.getLogger().warning("ERROR adding player to dungeon instance: \"" + e.getMessage() + "\"");
             }
@@ -172,20 +176,20 @@ public class DungeonManager implements Component {
         return instance;
     }
 
-    public DungeonPlayer getPlayer(String player) throws UnknownPlayerException {
+    public DungeonPlayer getPlayer(UUID playerId) throws UnknownPlayerException {
 
-        Player bukkitPlayer = Bukkit.getPlayer(player);
-        if (bukkitPlayer != null) {
-            player = bukkitPlayer.getName();
+        Player bukkitPlayer = Bukkit.getPlayer(playerId);
+        if (bukkitPlayer == null) {
+            throw new UnknownPlayerException("Cannot find player with the id (" + playerId + ")");
         }
-
-        if (!players.containsKey(player)) {
-            TDungeonPlayer tDungeonPlayer = plugin.getDatabase().find(TDungeonPlayer.class).where().eq("player", player).findUnique();
-            if (bukkitPlayer == null && tDungeonPlayer == null) {
-                throw new UnknownPlayerException("The player " + player + " is not online and does not exist in the database!");
-            } else if (bukkitPlayer != null && tDungeonPlayer == null) {
+        if (!players.containsKey(bukkitPlayer.getUniqueId())) {
+            TDungeonPlayer tDungeonPlayer = plugin.getDatabase().find(TDungeonPlayer.class)
+                    .where().eq("player_id", playerId).findUnique();
+            if (tDungeonPlayer == null) {
+                // TODO: check sense
+                // create new TDungeonPlayer
                 tDungeonPlayer = new TDungeonPlayer();
-                tDungeonPlayer.setPlayer(player);
+                tDungeonPlayer.setPlayerId(playerId);
                 Location location = bukkitPlayer.getLocation();
                 tDungeonPlayer.setLastWorld(location.getWorld().getName());
                 tDungeonPlayer.setLastX(location.getX());
@@ -196,17 +200,17 @@ public class DungeonManager implements Component {
                 plugin.getDatabase().save(tDungeonPlayer);
             }
             BukkitDungeonPlayer dungeonPlayer = new BukkitDungeonPlayer(tDungeonPlayer);
-            players.put(dungeonPlayer.getName(), dungeonPlayer);
+            players.put(dungeonPlayer.getPlayerId(), dungeonPlayer);
         }
-        return players.get(player);
+        return players.get(playerId);
     }
 
     public DungeonPlayer getPlayer(Player player) {
 
         try {
-            return getPlayer(player.getName());
-        } catch (UnknownPlayerException ignored) {
-            // will never occur
+            return getPlayer(player.getUniqueId());
+        } catch (UnknownPlayerException e) {
+            e.printStackTrace();
         }
         return null;
     }

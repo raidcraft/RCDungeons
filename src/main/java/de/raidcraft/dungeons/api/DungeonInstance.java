@@ -4,6 +4,7 @@ import org.bukkit.World;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * @author Silthus
@@ -77,6 +78,7 @@ public interface DungeonInstance {
      * Removes the vien player from the dungeon instance if he is in it.
      *
      * @param player to remove from the instance
+     *
      * @return true if player was removed, false if he wasn't in the dungeon
      */
     public DungeonPlayer removePlayer(DungeonPlayer player);
@@ -86,16 +88,18 @@ public interface DungeonInstance {
     /**
      * Removes the vien player from the dungeon instance if he is in it.
      *
-     * @param player to remove from the instance
+     * @param playerId to remove from the instance
+     *
      * @return true if player was removed, false if he wasn't in the dungeon
      */
-    public DungeonPlayer removePlayer(String player);
+    public DungeonPlayer removePlayer(UUID playerId);
 
     /**
      * Checks if the dungeon instance contains the player. Will also return true if
      * the player is not in the instance and only registered for it.
      *
      * @param player to check for
+     *
      * @return true if player is registered in this instance
      */
     public boolean containsPlayer(DungeonPlayer player);
@@ -104,10 +108,11 @@ public interface DungeonInstance {
      * Checks if the dungeon instance contains the player. Will also return true if
      * the player is not in the instance and only registered for it.
      *
-     * @param player to check for
+     * @param playerId to check for
+     *
      * @return true if player is registered in this instance
      */
-    public boolean containsPlayer(String player);
+    public boolean containsPlayer(UUID playerId);
 
     /**
      * Gets all players that are attached to this instance.

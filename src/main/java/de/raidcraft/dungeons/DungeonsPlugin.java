@@ -14,6 +14,7 @@ import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
+import de.raidcraft.util.PlayerUtil;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -131,7 +132,15 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
     @Override
     public void start(String dungeonName, Player player, int radius) {
-        //TODO: implement
+
+        try {
+            World w = dungeonManager.getWorld(dungeonName);
+            // TODO: use dungeon api
+            PlayerUtil.getPlayerNearby(player, radius)
+                    .forEach(tmpPlayer -> tmpPlayer.teleport(w.getSpawnLocation()));
+        } catch (RaidCraftException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -4,9 +4,9 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import de.raidcraft.dungeons.DungeonException;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.Dungeon;
+import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.util.UUIDUtil;
@@ -87,26 +87,6 @@ public class AdminCommands {
     }
 
     @Command(
-            aliases = {"test"},
-            desc = "Creates a test instance of the dungeon",
-            min = 1,
-            usage = "<name>"
-    )
-    @CommandPermissions("rcdungeons.test")
-    public void test(CommandContext args, CommandSender sender) throws CommandException {
-
-        try {
-            Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
-            DungeonPlayer player = plugin.getDungeonManager().getPlayer((Player) sender);
-            DungeonInstance instance = dungeon.createInstance(player.getName());
-            instance.teleport(player);
-            sender.sendMessage("Created dungeon test instance with the id " + instance.getId());
-        } catch (DungeonException e) {
-            throw new CommandException(e.getMessage());
-        }
-    }
-
-    @Command(
             aliases = {"start"},
             desc = "Starts the Quest Creation Wizard",
             min = 1,
@@ -130,5 +110,25 @@ public class AdminCommands {
             throw new CommandException("Playercommand");
         }
         ((Player) sender).getWorld().save();
+    }
+
+    @Command(
+            aliases = {"test"},
+            desc = "Creates a test instance of the dungeon",
+            min = 1,
+            usage = "<name>"
+    )
+    @CommandPermissions("rcdungeons.test")
+    public void test(CommandContext args, CommandSender sender) throws CommandException {
+
+        try {
+            Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
+            DungeonPlayer player = plugin.getDungeonManager().getPlayer((Player) sender);
+            DungeonInstance instance = dungeon.createInstance(player.getPlayerId());
+            instance.teleport(player);
+            sender.sendMessage("Created dungeon test instance with the id " + instance.getId());
+        } catch (DungeonException e) {
+            throw new CommandException(e.getMessage());
+        }
     }
 }

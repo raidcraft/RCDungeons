@@ -49,38 +49,31 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
     @Override
     public World loadWorld() {
-        // if template, copy it
 
         Location spawn = getDungeon().getSpawnLocation();
+        // create new chunk generator
         DungeonWorldCreator creator = new DungeonWorldCreator(this.worldName, spawn);
         // copy template world
-        copy(DungeonUtils.getTemplateWorldName(getDungeon().getName()), this.worldName);
-        //        World template = getDungeon().getTemplateWorld();
-        // load template World if not loaded
-        //        if (template == null) {
-        //            template = Bukkit.createWorld(new DungeonWorldCreator(worldName, getDungeon().getSpawnLocation()));
-        //            getDungeon().setTemplateWorld(template);
-        //        }
-        //        WorldCreator wc = creator.copy(template);
-
-        World w = Bukkit.createWorld(creator);
-        return w;
+        copyMapData(DungeonUtils.getTemplateWorldName(getDungeon().getName()), this.worldName);
+        // load map
+        return Bukkit.createWorld(creator);
     }
 
-    public void copy(String template, String target) {
+    public void copyMapData(String template, String target) {
 
         try {
             DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
             File src = new File(Bukkit.getWorldContainer() + File.separator + template);
             File dest = new File(Bukkit.getWorldContainer() + File.separator + target);
             if (dest.exists()) {
-                RaidCraft.LOGGER.info("try to copy existing world: " + target);
+                RaidCraft.LOGGER.info("copyMapData: target world exists: " + target);
                 return;
             }
             FileUtils.copyDirectory(src, dest);
             // delete data files
             FileUtils.forceDelete(new File(dest.getAbsoluteFile() + File.separator + "uid.dat"));
         } catch (IOException e) {
+            RaidCraft.LOGGER.info("copyMapData: cannot copy (" + template + ") to: (" + target + ")");
             e.printStackTrace();
         }
     }

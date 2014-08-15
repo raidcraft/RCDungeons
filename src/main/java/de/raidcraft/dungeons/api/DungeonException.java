@@ -1,4 +1,4 @@
-package de.raidcraft.dungeons;
+package de.raidcraft.dungeons.api;
 
 import de.raidcraft.api.RaidCraftException;
 

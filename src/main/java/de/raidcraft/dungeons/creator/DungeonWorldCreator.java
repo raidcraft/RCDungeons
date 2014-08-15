@@ -43,10 +43,10 @@ public class DungeonWorldCreator extends WorldCreator {
             }
 
             @Override
+            @Deprecated
             public byte[][] generateBlockSections(World world, Random random, int x, int z, BiomeGrid biomes) {
 
-                byte[][] result = new byte[world.getMaxHeight() / 16][]; //world height / chunk part height (=16, look above)
-                return result;
+                return new byte[world.getMaxHeight() / 16][]; //world height / chunk part height (=16, look above)
             }
         });
     }

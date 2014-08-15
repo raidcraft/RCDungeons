@@ -13,6 +13,7 @@ import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +26,7 @@ public class SimpleDungeon extends AbstractDungeon {
     private World templateWorld;
 
     public SimpleDungeon(TDungeon dungeon, World templateWorld) {
+
         super(dungeon.getId(), dungeon.getName());
         this.templateWorld = templateWorld;
         setFriendlyName(dungeon.getFriendlyName());
@@ -51,9 +53,10 @@ public class SimpleDungeon extends AbstractDungeon {
     }
 
     @Override
-    public DungeonInstance createInstance(String... players) {
+    public DungeonInstance createInstance(UUID... players) {
 
-        DungeonInstance instance = RaidCraft.getComponent(DungeonManager.class).createDungeonInstance(this, players);
+        DungeonInstance instance = RaidCraft.getComponent(DungeonManager.class)
+                .createDungeonInstance(this, players);
         instances.add(instance);
         return instance;
     }
@@ -73,7 +76,7 @@ public class SimpleDungeon extends AbstractDungeon {
     }
 
     @Override
-    public DungeonInstance getActiveInstance(String player) {
+    public DungeonInstance getActiveInstance(UUID player) {
 
         for (DungeonInstance instance : getActiveInstances()) {
             if (instance.containsPlayer(player)) {

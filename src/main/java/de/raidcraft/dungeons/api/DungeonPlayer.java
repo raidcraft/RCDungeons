@@ -3,6 +3,7 @@ package de.raidcraft.dungeons.api;
 import org.bukkit.Location;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Silthus
@@ -12,11 +13,11 @@ public interface DungeonPlayer {
     public int getId();
 
     /**
-     * Gets the name of the player.
+     * Gets the UUID of the player.
      *
      * @return player name
      */
-    public String getName();
+    public UUID getPlayerId();
 
     public void setLastPosition(Location lastPosition);
 
@@ -39,6 +40,7 @@ public interface DungeonPlayer {
      * a new one will be created for the player.
      *
      * @param dungeon to get instance for
+     *
      * @return new or existing instance
      */
     public DungeonInstance getDungeonInstance(Dungeon dungeon);

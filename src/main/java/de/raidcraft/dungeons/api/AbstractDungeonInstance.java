@@ -1,13 +1,14 @@
 package de.raidcraft.dungeons.api;
 
-import de.raidcraft.util.CaseInsensitiveMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Silthus
@@ -16,7 +17,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
 
     private final int id;
     private final Dungeon dungeon;
-    private final Map<String, DungeonPlayer> players = new CaseInsensitiveMap<>();
+    private final Map<UUID, DungeonPlayer> players = new HashMap<>();
     private boolean active;
     private boolean completed;
     private boolean locked;
@@ -49,7 +50,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public void teleport(DungeonPlayer player) {
 
-        Player bukkitPlayer = Bukkit.getPlayer(player.getName());
+        Player bukkitPlayer = Bukkit.getPlayer(player.getPlayerId());
         if (bukkitPlayer != null) {
             player.setLastPosition(bukkitPlayer.getLocation());
             Location spawnLocation = getDungeon().getSpawnLocation();
@@ -61,7 +62,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public void addPlayer(DungeonPlayer player) {
 
-        players.put(player.getName(), player);
+        players.put(player.getPlayerId(), player);
     }
 
     @Override
@@ -76,7 +77,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public DungeonPlayer removePlayer(DungeonPlayer player) {
 
-        return removePlayer(player.getName());
+        return removePlayer(player);
     }
 
     @Override
@@ -84,7 +85,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
 
         DungeonPlayer dungeonPlayer = removePlayer(player);
         if (teleport) {
-            Player bPlayer = Bukkit.getPlayer(player.getName());
+            Player bPlayer = Bukkit.getPlayer(player.getPlayerId());
             if (bPlayer != null) {
                 bPlayer.teleport(player.getLastPosition());
             }
@@ -93,21 +94,21 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     }
 
     @Override
-    public DungeonPlayer removePlayer(String player) {
+    public DungeonPlayer removePlayer(UUID playerId) {
 
-        return players.remove(player);
+        return players.remove(playerId);
     }
 
     @Override
     public boolean containsPlayer(DungeonPlayer player) {
 
-        return containsPlayer(player.getName());
+        return containsPlayer(player.getPlayerId());
     }
 
     @Override
-    public boolean containsPlayer(String player) {
+    public boolean containsPlayer(UUID playerId) {
 
-        return players.containsKey(player);
+        return players.containsKey(playerId);
     }
 
     @Override

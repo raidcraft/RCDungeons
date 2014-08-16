@@ -173,6 +173,10 @@ public class DungeonManager implements Component {
             }
         }
         instance.save();
+        // load the world
+        // TODO: load world
+        // teleport the players
+        // TODO: teleport players
         return instance;
     }
 

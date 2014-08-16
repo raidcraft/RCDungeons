@@ -7,6 +7,7 @@ import de.raidcraft.api.BasePlugin;
 import de.raidcraft.api.RaidCraftException;
 import de.raidcraft.api.config.ConfigurationBase;
 import de.raidcraft.api.config.Setting;
+import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonAPI;
 import de.raidcraft.dungeons.commands.AdminCommands;
 import de.raidcraft.dungeons.tables.TDungeon;
@@ -21,6 +22,8 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Silthus
@@ -134,10 +137,11 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
     public void start(String dungeonName, Player player, int radius) {
 
         try {
-            World w = dungeonManager.getWorld(dungeonName);
-            // TODO: use dungeon api
-            PlayerUtil.getPlayerNearby(player, radius)
-                    .forEach(tmpPlayer -> tmpPlayer.teleport(w.getSpawnLocation()));
+            List<UUID> playerIds = PlayerUtil.getPlayerNearby(player, radius).stream()
+                    .map(Player::getUniqueId).collect(Collectors.toList());
+            Dungeon dungeon = dungeonManager.getDungeon(dungeonName);
+            dungeonManager.createDungeonInstance(dungeon, playerIds.toArray(new UUID[playerIds.size()]));
+
         } catch (RaidCraftException e) {
             e.printStackTrace();
         }

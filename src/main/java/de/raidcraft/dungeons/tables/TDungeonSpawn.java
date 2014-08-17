@@ -26,6 +26,7 @@ public class TDungeonSpawn {
     private float spawnPitch;
 
     public TDungeonSpawn() {
+
     }
 
     public TDungeonSpawn(Location location) {

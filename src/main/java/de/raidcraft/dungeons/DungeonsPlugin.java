@@ -10,6 +10,7 @@ import de.raidcraft.api.config.Setting;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonAPI;
 import de.raidcraft.dungeons.commands.AdminCommands;
+import de.raidcraft.dungeons.listeners.PlayerListener;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
@@ -39,6 +40,7 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
         this.config = configure(new LocalConfiguration(this), true);
         this.dungeonManager = new DungeonManager(this);
         registerCommands(BaseCommands.class);
+        registerEvents(new PlayerListener(this));
     }
 
     @Override
@@ -141,6 +143,17 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
                     .map(Player::getUniqueId).collect(Collectors.toList());
             Dungeon dungeon = dungeonManager.getDungeon(dungeonName);
             dungeonManager.createDungeonInstance(dungeon, playerIds.toArray(new UUID[playerIds.size()]));
+
+        } catch (RaidCraftException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void start(String dungeonName, Player player) {
+
+        try {
+            Dungeon dungeon = dungeonManager.getDungeon(dungeonName);
+            dungeonManager.createDungeonInstance(dungeon, player.getUniqueId());
 
         } catch (RaidCraftException e) {
             e.printStackTrace();

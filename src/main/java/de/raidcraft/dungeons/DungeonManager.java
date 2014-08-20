@@ -11,10 +11,8 @@ import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
-import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
-import de.raidcraft.dungeons.types.PersistantDungeonInstance;
 import de.raidcraft.dungeons.util.DungeonUtils;
 import de.raidcraft.util.CaseInsensitiveMap;
 import de.raidcraft.util.TimeUtil;
@@ -26,7 +24,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,28 +153,29 @@ public class DungeonManager implements Component {
     public DungeonInstance createDungeonInstance(Dungeon dungeon, UUID... players) {
 
         // prepare an initial table entry to provide a valid id to the new dungeon instance
-        TDungeonInstance tableEntry = new TDungeonInstance();
-        tableEntry.setDungeon(plugin.getDatabase().find(TDungeon.class, dungeon.getId()));
-        tableEntry.setCompleted(false);
-        tableEntry.setLocked(false);
-        tableEntry.setActive(false);
-        tableEntry.setCreationTime(new Timestamp(System.currentTimeMillis()));
-        plugin.getDatabase().save(tableEntry);
-        // now we have our id we can create the actual dungeon instance
-        DungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
-        for (UUID playerId : players) {
-            try {
-                instance.addPlayer(getPlayer(playerId));
-            } catch (UnknownPlayerException e) {
-                plugin.getLogger().warning("ERROR adding player to dungeon instance: \"" + e.getMessage() + "\"");
-            }
-        }
-        instance.save();
+        //        TDungeonInstance tableEntry = new TDungeonInstance();
+        //        tableEntry.setDungeon(plugin.getDatabase().find(TDungeon.class, dungeon.getId()));
+        //        tableEntry.setCompleted(false);
+        //        tableEntry.setLocked(false);
+        //        tableEntry.setActive(false);
+        //        tableEntry.setCreationTime(new Timestamp(System.currentTimeMillis()));
+        //        plugin.getDatabase().save(tableEntry);
+        //        // now we have our id we can create the actual dungeon instance
+        //        DungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
+        //        for (UUID playerId : players) {
+        //            try {
+        //                instance.addPlayer(getPlayer(playerId));
+        //            } catch (UnknownPlayerException e) {
+        //                plugin.getLogger().warning("ERROR adding player to dungeon instance: \"" + e.getMessage() + "\"");
+        //            }
+        //        }
+        //        instance.save();
         // load the world
         // TODO: load world
         // teleport the players
         // TODO: teleport players
-        return instance;
+        //        return instance;/
+        return null;
     }
 
     public DungeonPlayer getPlayer(UUID playerId) throws UnknownPlayerException {

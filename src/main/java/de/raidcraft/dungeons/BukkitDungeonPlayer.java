@@ -42,6 +42,7 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
                 }
             } catch (DungeonException e) {
                 RaidCraft.LOGGER.warning(e.getMessage());
+                e.printStackTrace();
             }
         }
     }

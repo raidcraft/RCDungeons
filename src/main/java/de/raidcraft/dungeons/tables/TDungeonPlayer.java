@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -35,12 +36,13 @@ public class TDungeonPlayer {
     private double lastZ;
     private float lastYaw;
     private float lastPitch;
+    // TODO: dirty hack, remove it
+    private String lastInstance;
     @OneToMany
     @JoinColumn(name = "player_id")
     private List<TDungeonInstancePlayer> instances = new ArrayList<>();
     @Transient
     private Location cacheLastWorld;
-
 
     public Location getLastPosition() {
 
@@ -52,5 +54,16 @@ public class TDungeonPlayer {
                     lastX, lastY, lastZ, lastYaw, lastPitch);
         }
         return cacheLastWorld;
+    }
+
+    public void init(Player bukkitPlayer) {
+        Location loc = bukkitPlayer.getLocation();
+        setLastPitch(loc.getPitch());
+        setLastYaw(loc.getYaw());
+        setLastX(loc.getX());
+        setLastY(loc.getY());
+        setLastZ(loc.getZ());
+        setLastWorld(loc.getWorld().getName());
+        setPlayerId(bukkitPlayer.getUniqueId());
     }
 }

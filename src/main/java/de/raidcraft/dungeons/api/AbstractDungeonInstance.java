@@ -1,11 +1,12 @@
 package de.raidcraft.dungeons.api;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,13 +14,17 @@ import java.util.UUID;
 /**
  * @author Silthus
  */
+@Getter
 public abstract class AbstractDungeonInstance implements DungeonInstance {
 
     private final int id;
     private final Dungeon dungeon;
     private final Map<UUID, DungeonPlayer> players = new HashMap<>();
+    @Setter
     private boolean active;
+    @Setter
     private boolean completed;
+    @Setter
     private boolean locked;
     protected Timestamp creationTime;
 
@@ -27,24 +32,6 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
 
         this.id = id;
         this.dungeon = dungeon;
-    }
-
-    @Override
-    public int getId() {
-
-        return id;
-    }
-
-    @Override
-    public Dungeon getDungeon() {
-
-        return dungeon;
-    }
-
-    @Override
-    public Timestamp getCreationTime() {
-
-        return creationTime;
     }
 
     @Override
@@ -77,7 +64,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public DungeonPlayer removePlayer(DungeonPlayer player) {
 
-        return removePlayer(player);
+        return players.remove(player.getPlayerId());
     }
 
     @Override
@@ -109,47 +96,5 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     public boolean containsPlayer(UUID playerId) {
 
         return players.containsKey(playerId);
-    }
-
-    @Override
-    public Collection<DungeonPlayer> getPlayers() {
-
-        return players.values();
-    }
-
-    @Override
-    public boolean isActive() {
-
-        return active;
-    }
-
-    @Override
-    public void setActive(boolean active) {
-
-        this.active = active;
-    }
-
-    @Override
-    public boolean isCompleted() {
-
-        return completed;
-    }
-
-    @Override
-    public void setCompleted(boolean completed) {
-
-        this.completed = completed;
-    }
-
-    @Override
-    public boolean isLocked() {
-
-        return locked || getDungeon().isLocked();
-    }
-
-    @Override
-    public void setLocked(boolean locked) {
-
-        this.locked = locked;
     }
 }

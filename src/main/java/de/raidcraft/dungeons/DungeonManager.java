@@ -57,7 +57,7 @@ public class DungeonManager implements Component {
     private void load() {
 
         for (TDungeon dungeon : plugin.getDatabase().find(TDungeon.class).findList()) {
-            SimpleDungeon simpleDungeon = new SimpleDungeon(dungeon, Bukkit.getWorld(DungeonUtils.getTemplateWorldName(dungeon.getName())));
+            SimpleDungeon simpleDungeon = new SimpleDungeon(dungeon, DungeonUtils.getTemplateWorldName(dungeon.getName()));
             this.dungeons.put(simpleDungeon.getName(), simpleDungeon);
             plugin.info("Loaded dungeon template for: " + simpleDungeon.getName() + " - " + simpleDungeon.getFriendlyName());
         }
@@ -115,7 +115,7 @@ public class DungeonManager implements Component {
         spawn.setDungeon(tDungeon);
         plugin.getDatabase().save(spawn);
 
-        SimpleDungeon dungeon = new SimpleDungeon(tDungeon, createDungeonWorld(creator, DungeonUtils.getTemplateWorldName(tDungeon.getName())));
+        SimpleDungeon dungeon = new SimpleDungeon(tDungeon, DungeonUtils.getTemplateWorldName(tDungeon.getName()));
         Location loc = creator.getLocation();
         loc.setWorld(dungeon.getTemplateWorld());
         dungeon.setSpawnLocation(loc);
@@ -123,7 +123,7 @@ public class DungeonManager implements Component {
         return dungeon;
     }
 
-    public World createDungeonWorld(Player creator, String worldName) throws RaidCraftException {
+    private World createDungeonWorld(Player creator, String worldName) throws RaidCraftException {
         // create empty world
         World world = Bukkit.createWorld(new DungeonWorldCreator(worldName, creator.getLocation()));
 

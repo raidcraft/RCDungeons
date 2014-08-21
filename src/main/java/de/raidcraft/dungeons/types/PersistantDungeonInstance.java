@@ -13,6 +13,7 @@ import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.util.DungeonUtils;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -20,6 +21,7 @@ import org.bukkit.World;
 /**
  * @author Silthus
  */
+@Getter
 public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
     private final String worldName;

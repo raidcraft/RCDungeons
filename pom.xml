@@ -49,7 +49,7 @@
         <dependency>
             <groupId>de.raidcraft</groupId>
             <artifactId>connect</artifactId>
-            <version>${rc.version}</version>
+            <version>1.0.0-develop-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>

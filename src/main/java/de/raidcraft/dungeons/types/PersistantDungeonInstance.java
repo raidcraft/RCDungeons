@@ -3,6 +3,7 @@ package de.raidcraft.dungeons.types;
 import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.DungeonsPlugin;
+import de.raidcraft.dungeons.WorldManager;
 import de.raidcraft.dungeons.api.AbstractDungeonInstance;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonPlayer;
@@ -12,13 +13,9 @@ import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.util.DungeonUtils;
-import net.minecraft.util.org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Silthus
@@ -54,28 +51,9 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
         // create new chunk generator
         DungeonWorldCreator creator = new DungeonWorldCreator(this.worldName, spawn);
         // copy template world
-        copyMapData(DungeonUtils.getTemplateWorldName(getDungeon().getName()), this.worldName);
+        WorldManager.copyMapData(DungeonUtils.getTemplateWorldName(getDungeon().getName()), this.worldName);
         // load map
         return Bukkit.createWorld(creator);
-    }
-
-    public void copyMapData(String template, String target) {
-
-        try {
-            DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
-            File src = new File(Bukkit.getWorldContainer() + File.separator + template);
-            File dest = new File(Bukkit.getWorldContainer() + File.separator + target);
-            if (dest.exists()) {
-                RaidCraft.LOGGER.info("copyMapData: target world exists: " + target);
-                return;
-            }
-            FileUtils.copyDirectory(src, dest);
-            // delete data files
-            FileUtils.forceDelete(new File(dest.getAbsoluteFile() + File.separator + "uid.dat"));
-        } catch (IOException e) {
-            RaidCraft.LOGGER.info("copyMapData: cannot copy (" + template + ") to: (" + target + ")");
-            e.printStackTrace();
-        }
     }
 
     @Override

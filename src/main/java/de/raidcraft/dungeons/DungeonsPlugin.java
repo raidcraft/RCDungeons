@@ -17,6 +17,7 @@ import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.util.PlayerUtil;
+import lombok.Getter;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 /**
@@ -32,13 +34,19 @@ import java.util.stream.Collectors;
 public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
     private DungeonManager dungeonManager;
+    @Getter
+    private InstanceManager instanceManager;
     private LocalConfiguration config;
+    // only allow one intance creation, world creation at once
+    @Getter
+    private Semaphore createWorldLock = new Semaphore(1, true);
 
     @Override
     public void enable() {
 
         this.config = configure(new LocalConfiguration(this), true);
         this.dungeonManager = new DungeonManager(this);
+        this.instanceManager = new InstanceManager(this);
         registerCommands(BaseCommands.class);
         registerEvents(new PlayerListener(this));
     }

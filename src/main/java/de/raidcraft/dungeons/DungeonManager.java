@@ -13,6 +13,8 @@ import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
+import de.raidcraft.dungeons.types.BukkitDungeonPlayer;
+import de.raidcraft.dungeons.types.SimpleDungeon;
 import de.raidcraft.dungeons.util.DungeonUtils;
 import de.raidcraft.util.CaseInsensitiveMap;
 import de.raidcraft.util.TimeUtil;

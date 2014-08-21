@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -96,5 +97,11 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     public boolean containsPlayer(UUID playerId) {
 
         return players.containsKey(playerId);
+    }
+
+    @Override
+    public Collection<DungeonPlayer> getPlayers() {
+
+        return players.values();
     }
 }

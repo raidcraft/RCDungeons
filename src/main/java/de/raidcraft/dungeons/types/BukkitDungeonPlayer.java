@@ -1,7 +1,9 @@
-package de.raidcraft.dungeons;
+package de.raidcraft.dungeons.types;
 
 import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
+import de.raidcraft.dungeons.DungeonManager;
+import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.AbstractDungeonPlayer;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonException;
@@ -9,7 +11,6 @@ import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
-import de.raidcraft.dungeons.types.PersistantDungeonInstance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

@@ -36,8 +36,6 @@ public class TDungeonPlayer {
     private double lastZ;
     private float lastYaw;
     private float lastPitch;
-    // TODO: dirty hack, remove it
-    private String lastInstance;
     @OneToMany
     @JoinColumn(name = "player_id")
     private List<TDungeonInstancePlayer> instances = new ArrayList<>();

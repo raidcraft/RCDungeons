@@ -6,8 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,7 +27,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     private boolean completed;
     @Setter
     private boolean locked;
-    protected Timestamp creationTime;
+    protected Date creationTime;
 
     public AbstractDungeonInstance(int id, Dungeon dungeon) {
 

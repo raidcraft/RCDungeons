@@ -2,8 +2,8 @@ package de.raidcraft.dungeons.api;
 
 import org.bukkit.World;
 
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -61,7 +61,7 @@ public interface DungeonInstance {
      *
      * @return creation time
      */
-    public Timestamp getCreationTime();
+    public Date getCreationTime();
 
     public void teleport(DungeonPlayer player);
 

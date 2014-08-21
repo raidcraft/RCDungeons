@@ -9,6 +9,8 @@ import de.raidcraft.api.config.ConfigurationBase;
 import de.raidcraft.api.config.Setting;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonAPI;
+import de.raidcraft.dungeons.api.DungeonInstance;
+import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.commands.AdminCommands;
 import de.raidcraft.dungeons.listeners.PlayerListener;
 import de.raidcraft.dungeons.tables.TDungeon;
@@ -31,11 +33,12 @@ import java.util.stream.Collectors;
 /**
  * @author Silthus
  */
+@Getter
 public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
     private DungeonManager dungeonManager;
-    @Getter
     private InstanceManager instanceManager;
+    private PlayerManager playerManager;
     private LocalConfiguration config;
     // only allow one intance creation, world creation at once
     @Getter
@@ -45,6 +48,7 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
     public void enable() {
 
         this.config = configure(new LocalConfiguration(this), true);
+        this.playerManager = new PlayerManager(this);
         this.dungeonManager = new DungeonManager(this);
         this.instanceManager = new InstanceManager(this);
         registerCommands(BaseCommands.class);
@@ -58,7 +62,8 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
     @Override
     public void reload() {
-
+        getPlayerManager().reload();
+        getInstanceManager().reload();
         getDungeonManager().reload();
     }
 
@@ -150,7 +155,7 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
             List<UUID> playerIds = PlayerUtil.getPlayerNearby(player, radius).stream()
                     .map(Player::getUniqueId).collect(Collectors.toList());
             Dungeon dungeon = dungeonManager.getDungeon(dungeonName);
-            dungeonManager.createDungeonInstance(dungeon, playerIds.toArray(new UUID[playerIds.size()]));
+            instanceManager.createDungeonInstance(dungeon, playerIds.toArray(new UUID[playerIds.size()]));
 
         } catch (RaidCraftException e) {
             e.printStackTrace();
@@ -161,7 +166,7 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
         try {
             Dungeon dungeon = dungeonManager.getDungeon(dungeonName);
-            dungeonManager.createDungeonInstance(dungeon, player.getUniqueId());
+            instanceManager.createDungeonInstance(dungeon, player.getUniqueId());
 
         } catch (RaidCraftException e) {
             e.printStackTrace();
@@ -169,7 +174,7 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
     }
 
     @Override
-    public void end(String instanceWorldName) {
+    public void end(DungeonInstance instance,DungeonReason reason) {
         //TODO: implement
     }
 }

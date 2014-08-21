@@ -1,14 +1,21 @@
 package de.raidcraft.dungeons;
 
+import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonException;
+import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
+import de.raidcraft.dungeons.tables.TDungeon;
+import de.raidcraft.dungeons.tables.TDungeonInstance;
+import de.raidcraft.dungeons.types.PersistantDungeonInstance;
 import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.Date;
 import java.util.Hashtable;
+import java.util.UUID;
 
 /**
  * @author Dragonfire
@@ -40,6 +47,35 @@ public class InstanceManager {
         return false;
     }
 
+    public DungeonInstance createDungeonInstance(Dungeon dungeon, UUID... players) {
+
+        //        prepare an initial table entry to provide a valid id to the new dungeon instance
+        TDungeonInstance tableEntry = new TDungeonInstance();
+        tableEntry.setDungeon(plugin.getDatabase().find(TDungeon.class, dungeon.getId()));
+        tableEntry.setCompleted(false);
+        tableEntry.setLocked(false);
+        tableEntry.setActive(false);
+        tableEntry.setCreationTime(new Date());
+        plugin.getDatabase().save(tableEntry);
+
+        // now we have our id we can create the actual dungeon instance
+        DungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
+        for (UUID playerId : players) {
+            try {
+                instance.addPlayer(plugin.getPlayerManager().getPlayer(playerId));
+            } catch (UnknownPlayerException e) {
+                plugin.getLogger().warning("ERROR adding player to dungeon instance: \"" + e.getMessage() + "\"");
+            }
+        }
+        instance.save();
+        //        load the world
+        //        TODO: load world
+        //        teleport the players
+        //        TODO: teleport players
+        return instance;
+        //        return null;
+    }
+
     public void createInstance(String templateWorld, String instanceId) {
 
         try {
@@ -67,5 +103,9 @@ public class InstanceManager {
         } finally {
             plugin.getCreateWorldLock().release();
         }
+    }
+
+    public void reload() {
+        // TODO: implement
     }
 }

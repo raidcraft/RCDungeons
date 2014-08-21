@@ -4,16 +4,11 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.api.Component;
 import de.raidcraft.api.RaidCraftException;
-import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonException;
-import de.raidcraft.dungeons.api.DungeonInstance;
-import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
-import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
-import de.raidcraft.dungeons.types.BukkitDungeonPlayer;
 import de.raidcraft.dungeons.types.SimpleDungeon;
 import de.raidcraft.dungeons.util.DungeonUtils;
 import de.raidcraft.util.CaseInsensitiveMap;
@@ -26,10 +21,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +32,6 @@ public class DungeonManager implements Component {
 
     private final DungeonsPlugin plugin;
     private final Map<String, Dungeon> dungeons = new CaseInsensitiveMap<>();
-    private final Map<UUID, DungeonPlayer> players = new HashMap<>();
     private WorldEditPlugin worldEdit;
 
     protected DungeonManager(DungeonsPlugin plugin) {
@@ -59,7 +51,6 @@ public class DungeonManager implements Component {
     public void reload() {
 
         dungeons.clear();
-        players.clear();
         load();
     }
 
@@ -68,7 +59,7 @@ public class DungeonManager implements Component {
         for (TDungeon dungeon : plugin.getDatabase().find(TDungeon.class).findList()) {
             SimpleDungeon simpleDungeon = new SimpleDungeon(dungeon, Bukkit.getWorld(DungeonUtils.getTemplateWorldName(dungeon.getName())));
             this.dungeons.put(simpleDungeon.getName(), simpleDungeon);
-            plugin.getLogger().info("Loaded dungeon template for: " + simpleDungeon.getName() + " - " + simpleDungeon.getFriendlyName());
+            plugin.info("Loaded dungeon template for: " + simpleDungeon.getName() + " - " + simpleDungeon.getFriendlyName());
         }
     }
 
@@ -111,7 +102,7 @@ public class DungeonManager implements Component {
         if (dungeons.containsKey(name)) {
             throw new RaidCraftException("Duplicate dungeon " + name + "! Aborted dungeon creation...");
         }
-        // first lets create our dungeon object
+        // first lets create our dungeon data object
         TDungeon tDungeon = new TDungeon();
         tDungeon.setName(name);
         tDungeon.setLocked(true);
@@ -152,70 +143,5 @@ public class DungeonManager implements Component {
         return world;
     }
 
-    public DungeonInstance createDungeonInstance(Dungeon dungeon, UUID... players) {
 
-        // prepare an initial table entry to provide a valid id to the new dungeon instance
-        //        TDungeonInstance tableEntry = new TDungeonInstance();
-        //        tableEntry.setDungeon(plugin.getDatabase().find(TDungeon.class, dungeon.getId()));
-        //        tableEntry.setCompleted(false);
-        //        tableEntry.setLocked(false);
-        //        tableEntry.setActive(false);
-        //        tableEntry.setCreationTime(new Timestamp(System.currentTimeMillis()));
-        //        plugin.getDatabase().save(tableEntry);
-        //        // now we have our id we can create the actual dungeon instance
-        //        DungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
-        //        for (UUID playerId : players) {
-        //            try {
-        //                instance.addPlayer(getPlayer(playerId));
-        //            } catch (UnknownPlayerException e) {
-        //                plugin.getLogger().warning("ERROR adding player to dungeon instance: \"" + e.getMessage() + "\"");
-        //            }
-        //        }
-        //        instance.save();
-        // load the world
-        // TODO: load world
-        // teleport the players
-        // TODO: teleport players
-        //        return instance;/
-        return null;
-    }
-
-    public DungeonPlayer getPlayer(UUID playerId) throws UnknownPlayerException {
-
-        Player bukkitPlayer = Bukkit.getPlayer(playerId);
-        if (bukkitPlayer == null) {
-            throw new UnknownPlayerException("Cannot find player with the id (" + playerId + ")");
-        }
-        if (!players.containsKey(bukkitPlayer.getUniqueId())) {
-            TDungeonPlayer tDungeonPlayer = plugin.getDatabase().find(TDungeonPlayer.class)
-                    .where().eq("player_id", playerId).findUnique();
-            if (tDungeonPlayer == null) {
-                // TODO: check sense
-                // create new TDungeonPlayer
-                tDungeonPlayer = new TDungeonPlayer();
-                tDungeonPlayer.setPlayerId(playerId);
-                Location location = bukkitPlayer.getLocation();
-                tDungeonPlayer.setLastWorld(location.getWorld().getName());
-                tDungeonPlayer.setLastX(location.getX());
-                tDungeonPlayer.setLastY(location.getY());
-                tDungeonPlayer.setLastZ(location.getZ());
-                tDungeonPlayer.setLastPitch(location.getPitch());
-                tDungeonPlayer.setLastYaw(location.getYaw());
-                plugin.getDatabase().save(tDungeonPlayer);
-            }
-            BukkitDungeonPlayer dungeonPlayer = new BukkitDungeonPlayer(tDungeonPlayer);
-            players.put(dungeonPlayer.getPlayerId(), dungeonPlayer);
-        }
-        return players.get(playerId);
-    }
-
-    public DungeonPlayer getPlayer(Player player) {
-
-        try {
-            return getPlayer(player.getUniqueId());
-        } catch (UnknownPlayerException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

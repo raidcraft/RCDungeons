@@ -4,6 +4,7 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
+import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonException;
@@ -123,11 +124,11 @@ public class AdminCommands {
 
         try {
             Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
-            DungeonPlayer player = plugin.getDungeonManager().getPlayer((Player) sender);
+            DungeonPlayer player = plugin.getPlayerManager().getPlayer(((Player) sender).getUniqueId());
             DungeonInstance instance = dungeon.createInstance(player.getPlayerId());
             instance.teleport(player);
             sender.sendMessage("Created dungeon test instance with the id " + instance.getId());
-        } catch (DungeonException e) {
+        } catch (DungeonException|UnknownPlayerException e) {
             throw new CommandException(e.getMessage());
         }
     }

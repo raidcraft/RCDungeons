@@ -2,7 +2,6 @@ package de.raidcraft.dungeons.types;
 
 import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
-import de.raidcraft.dungeons.DungeonManager;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.AbstractDungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
@@ -55,11 +54,12 @@ public class SimpleDungeon extends AbstractDungeon {
 
     @Override
     public DungeonInstance createInstance(UUID... players) {
-
-        DungeonInstance instance = RaidCraft.getComponent(DungeonManager.class)
-                .createDungeonInstance(this, players);
-        instances.add(instance);
-        return instance;
+        // TDOO: implement
+        //        DungeonInstance instance = RaidCraft.getComponent(DungeonManager.class)
+        //                .createDungeonInstance(this, players);
+        //        instances.add(instance);
+        //        return instance;
+        return null;
     }
 
     @Override

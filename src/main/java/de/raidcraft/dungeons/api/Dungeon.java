@@ -77,6 +77,8 @@ public interface Dungeon {
      */
     public void setLocked(boolean locked);
 
+    public String getTemplateWorldName();
+
     public World getTemplateWorld();
 
     public void setTemplateWorld(World templateWorld);

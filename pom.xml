@@ -50,7 +50,7 @@
         <dependency>
             <groupId>de.raidcraft</groupId>
             <artifactId>connect</artifactId>
-            <version>1.0.0-develop-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>

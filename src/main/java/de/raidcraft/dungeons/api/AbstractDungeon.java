@@ -1,8 +1,14 @@
 package de.raidcraft.dungeons.api;
 
+import de.raidcraft.RaidCraft;
+import de.raidcraft.dungeons.DungeonsPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Silthus
@@ -23,5 +29,31 @@ public abstract class AbstractDungeon implements Dungeon {
 
         this.id = id;
         this.name = name;
+    }
+
+    @Override
+    public DungeonInstance createInstance(UUID... players) {
+
+        return RaidCraft.getComponent(DungeonsPlugin.class).getInstanceManager()
+                .createDungeonInstance(this, players);
+    }
+
+    @Override
+    public List<DungeonInstance> getActiveInstances() {
+
+        return getInstances().stream()
+                .filter(DungeonInstance::isActive)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public DungeonInstance getActiveInstance(UUID player) {
+
+        for (DungeonInstance instance : getActiveInstances()) {
+            if (instance.containsPlayer(player)) {
+                return instance;
+            }
+        }
+        return null;
     }
 }

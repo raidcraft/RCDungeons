@@ -8,27 +8,29 @@ import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
+import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.World;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Silthus
  */
+@Getter
 public class SimpleDungeon extends AbstractDungeon {
 
     private final List<DungeonInstance> instances = new ArrayList<>();
+    private String templateWorldName;
     @Setter
     private World templateWorld;
 
-    public SimpleDungeon(TDungeon dungeon, World templateWorld) {
+
+    public SimpleDungeon(TDungeon dungeon, String templateWorld) {
 
         super(dungeon.getId(), dungeon.getName());
-        this.templateWorld = templateWorld;
+        this.templateWorldName = templateWorld;
         setFriendlyName(dungeon.getFriendlyName());
         setDescription(dungeon.getDescription());
         setResetTimeMillis(dungeon.getResetTimeMillis());
@@ -44,47 +46,6 @@ public class SimpleDungeon extends AbstractDungeon {
                 instances.add(new PersistantDungeonInstance(instance, this));
             }
         }
-    }
-
-    @Override
-    public World getTemplateWorld() {
-
-        return templateWorld;
-    }
-
-    @Override
-    public DungeonInstance createInstance(UUID... players) {
-        // TDOO: implement
-        //        DungeonInstance instance = RaidCraft.getComponent(DungeonManager.class)
-        //                .createDungeonInstance(this, players);
-        //        instances.add(instance);
-        //        return instance;
-        return null;
-    }
-
-    @Override
-    public List<DungeonInstance> getInstances() {
-
-        return instances;
-    }
-
-    @Override
-    public List<DungeonInstance> getActiveInstances() {
-
-        return this.instances.stream()
-                .filter(DungeonInstance::isActive)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public DungeonInstance getActiveInstance(UUID player) {
-
-        for (DungeonInstance instance : getActiveInstances()) {
-            if (instance.containsPlayer(player)) {
-                return instance;
-            }
-        }
-        return null;
     }
 
     @Override

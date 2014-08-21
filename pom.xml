@@ -24,7 +24,8 @@
     <name>RCDungeons</name>
 
     <scm>
-        <developerConnection>scm:git:ssh://git@git.raid-craft.de:22109/raid-craft-de/rcdungeons.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@raid-craft.de:22109/raid-craft-de/${project.artifactId}.git</developerConnection>
+        <tag>HEAD</tag>
     </scm>
 
     <parent>

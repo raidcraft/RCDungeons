@@ -1,12 +1,12 @@
 package de.raidcraft.dungeons.listeners;
 
+import de.raidcraft.connect.api.raidcraftevents.RE_PlayerSwitchServer;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 /**
  * @author Dragonfire
@@ -21,7 +21,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void join(PlayerJoinEvent event) {
+    public void join(RE_PlayerSwitchServer event) {
 
         TDungeonPlayer player = plugin.getDatabase().find(TDungeonPlayer.class)
                 .where().eq("player_id", event.getPlayer().getUniqueId().toString()).findUnique();

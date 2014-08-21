@@ -47,6 +47,11 @@
             <version>${rc.version}</version>
         </dependency>
         <dependency>
+            <groupId>de.raidcraft</groupId>
+            <artifactId>connect</artifactId>
+            <version>${rc.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
             <version>${rc.version}</version>

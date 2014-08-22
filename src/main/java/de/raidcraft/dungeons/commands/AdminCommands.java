@@ -5,11 +5,8 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import de.raidcraft.dungeons.DungeonsPlugin;
-import de.raidcraft.dungeons.api.Dungeon;
-import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
-import de.raidcraft.dungeons.api.DungeonPlayer;
-import de.raidcraft.util.UUIDUtil;
+import de.raidcraft.dungeons.api.DungeonReason;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -33,7 +30,7 @@ public class AdminCommands {
             aliases = {"reload"},
             desc = "Reloads the dungeons plugin"
     )
-    @CommandPermissions("rcdungeons.reload")
+    @CommandPermissions("rcdungeons.admin.reload")
     public void reload(CommandContext args, CommandSender sender) {
 
         plugin.reload();
@@ -42,11 +39,11 @@ public class AdminCommands {
 
     @Command(
             aliases = {"create"},
-            desc = "Creates a new dungeon schematic",
+            desc = "Creates a new dungeon with selected schematic",
             min = 2,
             usage = "<name> <friendlyName>"
     )
-    @CommandPermissions("rcdungeons.create")
+    @CommandPermissions("rcdungeons.admin.create")
     public void create(CommandContext args, CommandSender sender) throws CommandException {
 
         plugin.create((Player) sender, args.getString(0), args.getString(1));
@@ -54,10 +51,10 @@ public class AdminCommands {
 
     @Command(
             aliases = {"back"},
-            desc = "Port you back to the main world",
+            desc = "Port you back to the overworld",
             usage = "<world_name>"
     )
-    @CommandPermissions("rcdungeons.edit")
+    @CommandPermissions("rcdungeons.admin.back")
     public void back(CommandContext args, CommandSender sender) throws CommandException {
 
         Player player = (Player) sender;
@@ -78,32 +75,19 @@ public class AdminCommands {
             aliases = {"edit"},
             desc = "Edit a Template World",
             min = 1,
-            usage = "<name>"
+            usage = "<dungeon_name>"
     )
-    @CommandPermissions("rcdungeons.edit")
+    @CommandPermissions("rcdungeons.admin.edit")
     public void edit(CommandContext args, CommandSender sender) throws CommandException {
 
         plugin.edit((Player) sender, args.getString(0));
     }
 
     @Command(
-            aliases = {"start"},
-            desc = "Starts the Quest Creation Wizard",
-            min = 1,
-            usage = "<dungeon_name> <players...>"
-    )
-    @CommandPermissions("rcdungeons.start")
-    public void start(CommandContext args, CommandSender sender) {
-
-        Player player = (args.argsLength() == 2) ? Bukkit.getPlayer(UUIDUtil.convertPlayer(args.getString(1))) : (Player) sender;
-        Bukkit.broadcastMessage("start " + args.getString(0) + ": " + args.getString(1));
-    }
-
-    @Command(
             aliases = {"save"},
             desc = "Save you current world"
     )
-    @CommandPermissions("rcdungeons.save")
+    @CommandPermissions("rcdungeons.admin.save")
     public void save(CommandContext args, CommandSender sender) throws CommandException {
 
         if (!(sender instanceof Player)) {
@@ -113,22 +97,16 @@ public class AdminCommands {
     }
 
     @Command(
-            aliases = {"test"},
-            desc = "Creates a test instance of the dungeon",
-            min = 1,
-            usage = "<name>"
+            aliases = {"end"},
+            desc = "close the instance"
     )
-    @CommandPermissions("rcdungeons.test")
-    public void test(CommandContext args, CommandSender sender) throws CommandException {
+    @CommandPermissions("rcdungeons.admin.end")
+    public void end(CommandContext args, CommandSender sender) throws CommandException {
 
-        try {
-            Dungeon dungeon = plugin.getDungeonManager().getDungeon(args.getString(0));
-            DungeonPlayer player = plugin.getPlayerManager().getPlayer(((Player) sender).getUniqueId());
-            DungeonInstance instance = dungeon.createInstance(player.getPlayerId());
-            instance.teleport(player);
-            sender.sendMessage("Created dungeon test instance with the id " + instance.getId());
-        } catch (DungeonException e) {
-            e.printStackTrace();
+        DungeonInstance instance = plugin.getInstanceManager().getInstance(((Player) sender).getWorld());
+        if (instance == null) {
+            throw new CommandException("You are not in a instance");
         }
+        plugin.end(instance, DungeonReason.FINISH);
     }
 }

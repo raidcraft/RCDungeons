@@ -3,15 +3,18 @@ package de.raidcraft.dungeons;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.NestedCommand;
+import de.raidcraft.RaidCraft;
 import de.raidcraft.api.BasePlugin;
 import de.raidcraft.api.RaidCraftException;
 import de.raidcraft.api.config.ConfigurationBase;
 import de.raidcraft.api.config.Setting;
+import de.raidcraft.connect.ConnectPlugin;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonAPI;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.commands.AdminCommands;
+import de.raidcraft.dungeons.commands.PlayerCommands;
 import de.raidcraft.dungeons.listeners.PlayerListener;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
@@ -62,6 +65,7 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
     @Override
     public void reload() {
+
         getPlayerManager().reload();
         getInstanceManager().reload();
         getDungeonManager().reload();
@@ -123,6 +127,14 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
         @NestedCommand(AdminCommands.class)
         public void admin(CommandContext args, CommandSender sender) {
 
+        }
+
+        @Command(
+                aliases = {"rcd", "dungeon"},
+                desc = "Gives access to the dungeon player commands."
+        )
+        @NestedCommand(PlayerCommands.class)
+        public void player(CommandContext args, CommandSender sender) {
 
         }
     }
@@ -174,7 +186,14 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
     }
 
     @Override
-    public void end(DungeonInstance instance,DungeonReason reason) {
-        //TODO: implement
+    public void end(DungeonInstance instance, DungeonReason reason) {
+
+        getInstanceManager().end(instance, reason);
+    }
+
+    @Override
+    public void exit(Player player) {
+
+        RaidCraft.getComponent(ConnectPlugin.class).teleportBack(player);
     }
 }

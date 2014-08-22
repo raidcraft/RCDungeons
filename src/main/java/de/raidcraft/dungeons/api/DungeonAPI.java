@@ -14,4 +14,6 @@ public interface DungeonAPI {
     public void start(String dungeonName, Player player, int radius);
 
     public void end(DungeonInstance instance, DungeonReason reason);
+
+    public void exit(Player player);
 }

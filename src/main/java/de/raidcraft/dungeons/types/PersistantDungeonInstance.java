@@ -18,6 +18,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.UUID;
+
 /**
  * @author Silthus
  */
@@ -34,6 +36,20 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
         setLocked(instance.isLocked());
         setCompleted(instance.isCompleted());
         setActive(instance.isActive());
+        load(instance);
+    }
+
+    private void load(TDungeonInstance tInstance) {
+
+        DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
+        plugin.getDatabase().find(TDungeonInstancePlayer.class)
+                .where().eq("instance_id", tInstance.getId()).findList()
+                .stream().forEach(player -> {
+                    TDungeonPlayer tDungeonPlayer = player.getPlayer();
+                    UUID uuid = tDungeonPlayer.getPlayerId();
+                    addPlayer(plugin.getPlayerManager().getPlayer(uuid));
+                }
+        );
     }
 
     @Override

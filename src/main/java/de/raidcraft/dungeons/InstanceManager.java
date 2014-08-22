@@ -1,8 +1,10 @@
 package de.raidcraft.dungeons;
 
 import de.raidcraft.dungeons.api.Dungeon;
+import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
+import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
@@ -10,6 +12,7 @@ import de.raidcraft.dungeons.types.PersistantDungeonInstance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.Date;
 import java.util.Hashtable;
@@ -26,14 +29,35 @@ public class InstanceManager {
     public InstanceManager(DungeonsPlugin plugin) {
 
         this.plugin = plugin;
+        load();
     }
 
-    public DungeonInstance getInstance(String instanceId) {
+    public void load() {
+
+        plugin.getDatabase().find(TDungeonInstance.class)
+                .where().eq("completed", 0).eq("locked", 0)
+                .findList().stream().forEach(tInstance -> {
+            try {
+                DungeonInstance instance = new PersistantDungeonInstance(tInstance,
+                        plugin.getDungeonManager().getDungeon(tInstance.getDungeon().getName()));
+                addInstance(instance);
+            } catch (DungeonException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void addInstance(DungeonInstance instance) {
+
+        instances.put(instance.getId(), instance);
+    }
+
+    public DungeonInstance getInstance(int instanceId) {
 
         return instances.get(instanceId);
     }
 
-    public boolean instanceExists(String instanceId) {
+    public boolean instanceExists(int instanceId) {
 
         try {
             plugin.getCreateWorldLock().acquire();
@@ -60,12 +84,13 @@ public class InstanceManager {
         // now we have our id we can create the actual dungeon instance
         PersistantDungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
         for (UUID playerId : players) {
-                DungeonPlayer dungeonPlayer = plugin.getPlayerManager().getPlayer(playerId);
-                instance.addPlayer(dungeonPlayer);
-                dungeonPlayer.addDungeonInstance(instance);
-                dungeonPlayer.save();
+            DungeonPlayer dungeonPlayer = plugin.getPlayerManager().getPlayer(playerId);
+            instance.addPlayer(dungeonPlayer);
+            dungeonPlayer.addDungeonInstance(instance);
+            dungeonPlayer.save();
         }
         instance.save();
+        addInstance(instance);
         // load the world
         createInstanceWorld(instance, instance.getWorldName());
         // TODO: teleport the players ?
@@ -94,7 +119,47 @@ public class InstanceManager {
         return null;
     }
 
+    public DungeonInstance getInstance(World world) {
+
+        for (DungeonInstance instance : instances.values()) {
+            if (world.getName().equalsIgnoreCase(instance.getWorld().getName())) {
+                return instance;
+            }
+        }
+        return null;
+    }
+
+    public void end(DungeonInstance instance, DungeonReason reason) {
+
+        instance.getPlayers().forEach(p -> {
+            Player bukkitPlayer = Bukkit.getPlayer(p.getPlayerId());
+            // if on server and in instance
+            if (bukkitPlayer != null && instance.getWorld().getName().equalsIgnoreCase(
+                    bukkitPlayer.getWorld().getName())) {
+                plugin.exit(bukkitPlayer);
+            }
+        });
+        // close Instance
+        deleteWorld(instance);
+    }
+
+    private void deleteWorld(DungeonInstance instance) {
+        // keep data in database
+        instance.setActive(false);
+        instance.setCompleted(true);
+        instance.setLocked(true);
+        instance.save();
+        // clear cache
+        instances.remove(instance.getId());
+
+        instance.getPlayers().stream().forEach(player -> player.removeDungeonInstance(instance));
+        // delete world
+        WorldManager.deleteWorld(instance.getWorld());
+    }
+
     public void reload() {
-        // TODO: implement
+
+        instances.clear();
+        load();
     }
 }

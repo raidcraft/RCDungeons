@@ -38,6 +38,9 @@ public class PlayerManager {
 
     public DungeonPlayer getPlayer(UUID playerId) {
 
+        if (players.containsKey(playerId)) {
+            return players.get(playerId);
+        }
         Player bukkitPlayer = Bukkit.getPlayer(playerId);
         TDungeonPlayer tDungeonPlayer = plugin.getDatabase().find(TDungeonPlayer.class)
                 .where().eq("player_id", playerId).findUnique();
@@ -60,5 +63,4 @@ public class PlayerManager {
         players.put(dungeonPlayer.getPlayerId(), dungeonPlayer);
         return players.get(playerId);
     }
-
 }

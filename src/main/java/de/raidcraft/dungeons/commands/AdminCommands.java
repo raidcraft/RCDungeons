@@ -7,6 +7,7 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonReason;
+import de.raidcraft.util.CommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -98,12 +99,14 @@ public class AdminCommands {
 
     @Command(
             aliases = {"end"},
-            desc = "close the instance"
+            desc = "close the instance",
+            usage = "<player>"
     )
     @CommandPermissions("rcdungeons.admin.end")
     public void end(CommandContext args, CommandSender sender) throws CommandException {
 
-        DungeonInstance instance = plugin.getInstanceManager().getInstance(((Player) sender).getWorld());
+        Player player = args.argsLength() == 1 ? CommandUtil.grabPlayer(args.getString(0)) : (Player) sender;
+        DungeonInstance instance = plugin.getInstanceManager().getInstance(player.getWorld());
         if (instance == null) {
             throw new CommandException("You are not in a instance");
         }

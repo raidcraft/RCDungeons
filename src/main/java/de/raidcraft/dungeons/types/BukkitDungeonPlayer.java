@@ -104,5 +104,9 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
         player.setLastZ(position.getZ());
         player.setLastYaw((long) position.getYaw());
         player.setLastPitch((long) position.getPitch());
+        // save only instance, don't save the player in the instances
+        for (DungeonInstance instance : getDungeonInstances()) {
+            instance.save();
+        }
     }
 }

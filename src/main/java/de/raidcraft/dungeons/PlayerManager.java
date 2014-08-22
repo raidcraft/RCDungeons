@@ -1,6 +1,5 @@
 package de.raidcraft.dungeons;
 
-import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.types.BukkitDungeonPlayer;
@@ -37,25 +36,24 @@ public class PlayerManager {
                 .where().eq("player_id", playerId).findUnique() != null;
     }
 
-    public DungeonPlayer getPlayer(UUID playerId) throws UnknownPlayerException {
+    public DungeonPlayer getPlayer(UUID playerId) {
 
         Player bukkitPlayer = Bukkit.getPlayer(playerId);
-        if (bukkitPlayer == null) {
-            throw new UnknownPlayerException("Player is not online");
-        }
         TDungeonPlayer tDungeonPlayer = plugin.getDatabase().find(TDungeonPlayer.class)
                 .where().eq("player_id", playerId).findUnique();
         if (tDungeonPlayer == null) {
             // create new TDungeonPlayer
             tDungeonPlayer = new TDungeonPlayer();
             tDungeonPlayer.setPlayerId(playerId);
-            Location location = bukkitPlayer.getLocation();
-            tDungeonPlayer.setLastWorld(location.getWorld().getName());
-            tDungeonPlayer.setLastX(location.getX());
-            tDungeonPlayer.setLastY(location.getY());
-            tDungeonPlayer.setLastZ(location.getZ());
-            tDungeonPlayer.setLastPitch(location.getPitch());
-            tDungeonPlayer.setLastYaw(location.getYaw());
+            if (bukkitPlayer != null) {
+                Location location = bukkitPlayer.getLocation();
+                tDungeonPlayer.setLastWorld(location.getWorld().getName());
+                tDungeonPlayer.setLastX(location.getX());
+                tDungeonPlayer.setLastY(location.getY());
+                tDungeonPlayer.setLastZ(location.getZ());
+                tDungeonPlayer.setLastPitch(location.getPitch());
+                tDungeonPlayer.setLastYaw(location.getYaw());
+            }
             plugin.getDatabase().save(tDungeonPlayer);
         }
         BukkitDungeonPlayer dungeonPlayer = new BukkitDungeonPlayer(tDungeonPlayer);

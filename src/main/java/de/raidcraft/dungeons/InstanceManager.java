@@ -1,6 +1,5 @@
 package de.raidcraft.dungeons;
 
-import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
@@ -61,13 +60,10 @@ public class InstanceManager {
         // now we have our id we can create the actual dungeon instance
         PersistantDungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
         for (UUID playerId : players) {
-            try {
                 DungeonPlayer dungeonPlayer = plugin.getPlayerManager().getPlayer(playerId);
                 instance.addPlayer(dungeonPlayer);
+                dungeonPlayer.addDungeonInstance(instance);
                 dungeonPlayer.save();
-            } catch (UnknownPlayerException e) {
-                plugin.getLogger().warning("ERROR adding player to dungeon instance: \"" + e.getMessage() + "\"");
-            }
         }
         instance.save();
         // load the world

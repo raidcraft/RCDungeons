@@ -1,7 +1,6 @@
 package de.raidcraft.dungeons.listeners;
 
 import de.raidcraft.RaidCraft;
-import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.connect.ConnectPlugin;
 import de.raidcraft.connect.api.raidcraftevents.RE_PlayerSwitchServer;
 import de.raidcraft.connect.commands.DungeonConnect;
@@ -59,7 +58,7 @@ public class PlayerListener implements Listener {
                             uuids.toArray(new UUID[uuids.size()]));
                 }
                 player.teleport(instance.getWorld().getSpawnLocation());
-            } catch (DungeonException | UnknownPlayerException e) {
+            } catch (DungeonException e) {
                 e.printStackTrace();
             }
         }

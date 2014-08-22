@@ -120,6 +120,7 @@ public class DungeonManager implements Component {
         loc.setWorld(dungeon.getTemplateWorld());
         dungeon.setSpawnLocation(loc);
         this.dungeons.put(dungeon.getName(), dungeon);
+        createDungeonWorld(creator, dungeon.getTemplateWorldName());
         return dungeon;
     }
 

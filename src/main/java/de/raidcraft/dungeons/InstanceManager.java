@@ -3,6 +3,7 @@ package de.raidcraft.dungeons;
 import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
+import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
@@ -61,7 +62,9 @@ public class InstanceManager {
         PersistantDungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);
         for (UUID playerId : players) {
             try {
-                instance.addPlayer(plugin.getPlayerManager().getPlayer(playerId));
+                DungeonPlayer dungeonPlayer = plugin.getPlayerManager().getPlayer(playerId);
+                instance.addPlayer(dungeonPlayer);
+                dungeonPlayer.save();
             } catch (UnknownPlayerException e) {
                 plugin.getLogger().warning("ERROR adding player to dungeon instance: \"" + e.getMessage() + "\"");
             }

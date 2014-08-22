@@ -61,9 +61,22 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
     }
 
     @Override
+    public void addDungeonInstance(DungeonInstance newInstance) {
+
+        this.instances.put(newInstance.getDungeon(), newInstance);
+    }
+
+    @Override
     public DungeonInstance getActiveInstance() {
 
         return activeInstance;
+    }
+
+    @Override
+    public void setActiveDungeonInstance(DungeonInstance activeInstance) {
+
+        addDungeonInstance(activeInstance);
+        this.activeInstance = activeInstance;
     }
 
     @Override
@@ -91,8 +104,5 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
         player.setLastZ(position.getZ());
         player.setLastYaw((long) position.getYaw());
         player.setLastPitch((long) position.getPitch());
-        for (DungeonInstance instance : getDungeonInstances()) {
-            instance.save();
-        }
     }
 }

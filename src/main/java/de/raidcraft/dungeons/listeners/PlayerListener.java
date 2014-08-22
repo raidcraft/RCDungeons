@@ -1,6 +1,7 @@
 package de.raidcraft.dungeons.listeners;
 
 import de.raidcraft.RaidCraft;
+import de.raidcraft.api.player.UnknownPlayerException;
 import de.raidcraft.connect.ConnectPlugin;
 import de.raidcraft.connect.api.raidcraftevents.RE_PlayerSwitchServer;
 import de.raidcraft.connect.commands.DungeonConnect;
@@ -9,6 +10,8 @@ import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
+import de.raidcraft.dungeons.api.DungeonPlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -40,18 +43,23 @@ public class PlayerListener implements Listener {
         }
         if (event.getCause().equals(DungeonConnect.START_INSTACE)) {
             String dungeonName = event.getArgs()[0];
+            Player player = event.getPlayer();
             try {
                 Dungeon dungeon = plugin.getDungeonManager().getDungeon(dungeonName);
-                // TODO: only create once, only port other players
-                event.getPlayer().sendMessage("Create dungeon " + dungeonName);
-                // grab all players of the party
-                List<UUID> uuids =
-                        RaidCraft.getComponent(ConnectPlugin.class).getSimilarPlayerIds(event)
-                                .stream().map(TConnectPlayer::getPlayer).collect(Collectors.toList());
-                DungeonInstance instance = dungeon.createInstance(
-                        uuids.toArray(new UUID[uuids.size()]));
-                event.getPlayer().teleport(instance.getWorld().getSpawnLocation());
-            } catch (DungeonException e) {
+                DungeonPlayer dungeonPlayer = plugin.getPlayerManager()
+                        .getPlayer(player.getUniqueId());
+                DungeonInstance instance = dungeonPlayer.getDungeonInstance(dungeon);
+                if (instance == null) {
+                    player.sendMessage("Create dungeon " + dungeonName);
+                    // grab all players of the party
+                    List<UUID> uuids =
+                            RaidCraft.getComponent(ConnectPlugin.class).getSimilarPlayerIds(event)
+                                    .stream().map(TConnectPlayer::getPlayer).collect(Collectors.toList());
+                    instance = dungeon.createInstance(
+                            uuids.toArray(new UUID[uuids.size()]));
+                }
+                player.teleport(instance.getWorld().getSpawnLocation());
+            } catch (DungeonException | UnknownPlayerException e) {
                 e.printStackTrace();
             }
         }

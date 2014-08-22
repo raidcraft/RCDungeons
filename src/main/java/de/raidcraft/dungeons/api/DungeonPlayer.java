@@ -45,7 +45,11 @@ public interface DungeonPlayer {
      */
     public DungeonInstance getDungeonInstance(Dungeon dungeon);
 
+    public void addDungeonInstance(DungeonInstance newInstance);
+
     public DungeonInstance getActiveInstance();
+
+    public void setActiveDungeonInstance(DungeonInstance activeInstance);
 
     public void leaveActiveDungeon(DungeonReason reason);
 

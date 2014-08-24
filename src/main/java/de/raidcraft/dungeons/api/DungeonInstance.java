@@ -31,7 +31,7 @@ public interface DungeonInstance {
      *
      * @return unique world for the dungeon instance
      */
-    public World getWorld();
+    public World getWorld() throws WorldNotLoadedExpcetion;
 
     public String getWorldName(); // to get the world without load it
 

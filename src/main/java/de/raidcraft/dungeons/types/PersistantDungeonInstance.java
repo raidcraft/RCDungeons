@@ -7,6 +7,7 @@ import de.raidcraft.dungeons.api.AbstractDungeonInstance;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.api.DungeonReason;
+import de.raidcraft.dungeons.api.WorldNotLoadedExpcetion;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
@@ -50,12 +51,11 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     }
 
     @Override
-    public World getWorld() {
+    public World getWorld() throws WorldNotLoadedExpcetion {
 
         World world = Bukkit.getWorld(this.worldName);
         if (world == null) {
-            RaidCraft.getComponent(DungeonsPlugin.class).getLogger()
-                    .warning("World not loaded: (" + this.worldName + ")");
+            throw new WorldNotLoadedExpcetion(this.worldName);
         }
         return world;
     }
@@ -71,21 +71,33 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
                 player.leaveActiveDungeon(DungeonReason.UNLOAD);
             }
         }
-        return Bukkit.unloadWorld(getWorld(), true);
+        try {
+            return Bukkit.unloadWorld(getWorld(), true);
+        } catch (WorldNotLoadedExpcetion e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean delete(boolean force) {
 
-        return unload(force) && DungeonUtils.deleteWorld(getWorld());
+        try {
+            return unload(force) && DungeonUtils.deleteWorld(getWorld());
+        } catch (WorldNotLoadedExpcetion e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public void save() {
 
-        // save the world first
-        if (getWorld() != null) {
+        // save the world first, if loaded
+        try {
             getWorld().save();
+        } catch (WorldNotLoadedExpcetion e) {
+            // nothing, happend if in world creation process
         }
         // now save stuff to the database
         EbeanServer database = RaidCraft.getDatabase(DungeonsPlugin.class);

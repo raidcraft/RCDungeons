@@ -1,10 +1,13 @@
 package de.raidcraft.dungeons;
 
+import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.api.DungeonReason;
+import de.raidcraft.dungeons.api.WorldNotLoadedExpcetion;
+import de.raidcraft.dungeons.api.raidcraftevents.RE_InstanceLoadedEvent;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
@@ -12,7 +15,12 @@ import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.UUID;
@@ -20,7 +28,7 @@ import java.util.UUID;
 /**
  * @author Dragonfire
  */
-public class InstanceManager {
+public class InstanceManager implements Listener {
 
     private DungeonsPlugin plugin;
     private Hashtable<Integer, DungeonInstance> instances = new Hashtable<>(); // thread safe
@@ -29,6 +37,7 @@ public class InstanceManager {
 
         this.plugin = plugin;
         load();
+        plugin.registerEvents(this);
     }
 
     public void load() {
@@ -100,7 +109,7 @@ public class InstanceManager {
     public DungeonInstance getInstance(World world) {
 
         for (DungeonInstance instance : instances.values()) {
-            if (world.getName().equalsIgnoreCase(instance.getWorld().getName())) {
+            if (world.getName().equalsIgnoreCase(instance.getWorldName())) {
                 return instance;
             }
         }
@@ -112,7 +121,7 @@ public class InstanceManager {
         instance.getPlayers().forEach(p -> {
             Player bukkitPlayer = Bukkit.getPlayer(p.getPlayerId());
             // if on server and in instance
-            if (bukkitPlayer != null && instance.getWorld().getName().equalsIgnoreCase(
+            if (bukkitPlayer != null && instance.getWorldName().equalsIgnoreCase(
                     bukkitPlayer.getWorld().getName())) {
                 plugin.exit(bukkitPlayer);
             }
@@ -132,12 +141,43 @@ public class InstanceManager {
 
         instance.getPlayers().stream().forEach(player -> player.removeDungeonInstance(instance));
         // delete world
-        plugin.getWorldManager().deleteWorld(instance.getWorld());
+        try {
+            plugin.getWorldManager().deleteWorld(instance.getWorld());
+        } catch (WorldNotLoadedExpcetion e) {
+           e.printStackTrace();
+        }
     }
 
     public void reload() {
 
         instances.clear();
         load();
+    }
+
+    public DungeonInstance findInstance(String worldName) {
+
+        Collection<DungeonInstance> currentInstances = instances.values();
+        for (DungeonInstance instance : currentInstances) {
+            if (instance.getWorldName().equals(worldName)) {
+                return instance;
+            }
+        }
+        return null;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void worldLoad(WorldLoadEvent event) {
+
+        if (!event.getWorld().getName().startsWith(plugin.getConfig().dungeonInstancePrefix)) {
+            return;
+        }
+        World world = event.getWorld();
+        plugin.getLogger().info("instance loading detected: (" + world.getName() + ")");
+        // find instance
+        DungeonInstance instance = findInstance(world.getName());
+        if (instance == null) {
+            plugin.getLogger().warning("instance not loaded for world: (" + world.getName() + ")");
+        }
+        RaidCraft.callEvent(new RE_InstanceLoadedEvent(world, instance));
     }
 }

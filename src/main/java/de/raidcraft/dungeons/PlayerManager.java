@@ -1,11 +1,18 @@
 package de.raidcraft.dungeons;
 
+import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
+import de.raidcraft.dungeons.api.WorldNotLoadedExpcetion;
+import de.raidcraft.dungeons.api.raidcraftevents.RE_InstanceLoadedEvent;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.types.BukkitDungeonPlayer;
+import de.raidcraft.reference.Colors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,13 +21,14 @@ import java.util.UUID;
 /**
  * @author Dragonfire
  */
-public class PlayerManager {
+public class PlayerManager implements Listener {
 
     private final Map<UUID, DungeonPlayer> players = new HashMap<>();
 
     public PlayerManager(DungeonsPlugin plugin) {
 
         this.plugin = plugin;
+        plugin.registerEvents(this);
     }
 
     private DungeonsPlugin plugin;
@@ -28,6 +36,26 @@ public class PlayerManager {
     public void reload() {
 
         players.clear();
+    }
+
+    public void queuePlayerForInstance(Player player, DungeonInstance instance) {
+
+        if (!WorldManager.isLoaded(instance.getWorldName())) {
+            // wait on creation, RE_InstanceLoadedEvent teleport players
+            return;
+        }
+        teleportPlayer(player, instance);
+    }
+
+    private void teleportPlayer(Player player, DungeonInstance instance) {
+
+        try {
+            player.teleport(instance.getWorld().getSpawnLocation());
+            player.sendMessage(Colors.Chat.INFO + "Welcome into: " + Colors.Chat.SPECIAL + instance.getWorldName());
+
+        } catch (WorldNotLoadedExpcetion e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean playerExists(UUID playerId) {
@@ -62,5 +90,16 @@ public class PlayerManager {
         BukkitDungeonPlayer dungeonPlayer = new BukkitDungeonPlayer(tDungeonPlayer);
         players.put(dungeonPlayer.getPlayerId(), dungeonPlayer);
         return players.get(playerId);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void instanceLoaded(RE_InstanceLoadedEvent event) {
+
+        event.getInstance().getPlayers().stream().forEach(dungeonPlayer -> {
+            Player bukkitPlayer = Bukkit.getPlayer(dungeonPlayer.getPlayerId());
+            if (bukkitPlayer != null) {
+                teleportPlayer(bukkitPlayer, event.getInstance());
+            }
+        });
     }
 }

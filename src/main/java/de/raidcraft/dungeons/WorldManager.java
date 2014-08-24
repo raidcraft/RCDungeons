@@ -3,6 +3,7 @@ package de.raidcraft.dungeons;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.api.config.ConfigurationBase;
 import de.raidcraft.api.config.Setting;
+import de.raidcraft.dungeons.api.raidcraftevents.RE_InstanceCreatedEvent;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import net.minecraft.util.org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -63,6 +64,7 @@ public class WorldManager {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 copyMapData(template, target);
+                RaidCraft.callEvent(new RE_InstanceCreatedEvent(target));
                 if (spawn != null) {
                     Bukkit.getScheduler().runTask(plugin, () -> loadWorld(spawn, target));
                 }
@@ -131,5 +133,9 @@ public class WorldManager {
 
         @Setting("completed-worlds")
         public List<String> completedWorlds = new ArrayList<>();
+    }
+
+    public static boolean isLoaded(String worldName) {
+        return Bukkit.getWorld(worldName) != null;
     }
 }

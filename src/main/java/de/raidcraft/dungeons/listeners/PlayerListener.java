@@ -57,8 +57,7 @@ public class PlayerListener implements Listener {
                     instance = dungeon.createInstance(
                             uuids.toArray(new UUID[uuids.size()]));
                 }
-                player.teleport(instance.getWorld().getSpawnLocation());
-                player.sendMessage("Welcome in " + instance.getWorld().getName());
+                plugin.getPlayerManager().queuePlayerForInstance(player, instance);
             } catch (DungeonException e) {
                 e.printStackTrace();
             }

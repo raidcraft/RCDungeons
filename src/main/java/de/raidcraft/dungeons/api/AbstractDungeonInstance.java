@@ -41,12 +41,17 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public void teleport(DungeonPlayer player) {
 
+        // TODO: duplicated, see PlayerManager
         Player bukkitPlayer = Bukkit.getPlayer(player.getPlayerId());
         if (bukkitPlayer != null) {
             player.setLastPosition(bukkitPlayer.getLocation());
             Location spawnLocation = getDungeon().getSpawnLocation();
-            spawnLocation.setWorld(getWorld());
-            bukkitPlayer.teleport(spawnLocation);
+            try {
+                spawnLocation.setWorld(getWorld());
+                bukkitPlayer.teleport(spawnLocation);
+            } catch (WorldNotLoadedExpcetion e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -117,6 +122,6 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     public World loadWorld() {
 
         return RaidCraft.getComponent(DungeonsPlugin.class).getWorldManager()
-                .loadWorld(getDungeon().getSpawnLocation(),getWorldName());
+                .loadWorld(getDungeon().getSpawnLocation(), getWorldName());
     }
 }

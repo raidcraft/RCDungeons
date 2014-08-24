@@ -112,4 +112,26 @@ public class AdminCommands {
         }
         plugin.end(instance, DungeonReason.FINISH);
     }
+
+    // not working: OptimisticLockException: Data has changed
+
+    //    @Command(
+    //            aliases = {"setspawn"},
+    //            desc = "set the spawn point of the tempate to your current location"
+    //    )
+    //    @CommandPermissions("rcdungeons.admin.end")
+    //    public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
+    //
+    //        Player player = (Player) sender;
+    //        Dungeon dungeon = plugin.getDungeonManager().getDungeon(player.getWorld());
+    //        if (dungeon == null) {
+    //            throw new CommandException("You are not in a template dungeon");
+    //        }
+    //        TDungeonSpawn spawn = plugin.getDatabase().find(TDungeonSpawn.class)
+    //                .where().eq("dungeon_id", dungeon.getId()).findUnique();
+    //        spawn.setSpawn(player.getLocation());
+    //        plugin.getDatabase().update(spawn);
+    //        dungeon.setSpawnLocation(player.getLocation());
+    //        dungeon.save();
+    //    }
 }

@@ -63,6 +63,16 @@ public class DungeonManager implements Component {
         }
     }
 
+    public Dungeon getDungeon(World world) {
+
+        for (Dungeon dungeon : dungeons.values()) {
+            if (world.getName().equals(dungeon.getTemplateWorldName())) {
+                return dungeon;
+            }
+        }
+        return null;
+    }
+
     public Dungeon getDungeon(String name) throws DungeonException {
 
         if (dungeons.containsKey(name)) {

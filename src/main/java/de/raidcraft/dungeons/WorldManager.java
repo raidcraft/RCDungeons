@@ -33,8 +33,9 @@ public class WorldManager {
         this.completedWorlds = new CompletedWorlds(plugin);
         completedWorlds.load();
         // delete world from disk
-        completedWorlds.completedWorlds.forEach(this::deletWorldData);
+        completedWorlds.completedWorlds.forEach(this::deleteWorldData);
         completedWorlds.completedWorlds.clear();
+        completedWorlds.save();
     }
 
     public synchronized boolean copyProcessActive(String target) {
@@ -84,9 +85,10 @@ public class WorldManager {
             File src = new File(Bukkit.getWorldContainer() + File.separator + template);
             File dest = new File(Bukkit.getWorldContainer() + File.separator + target);
             if (dest.exists()) {
-                RaidCraft.LOGGER.info("copyMapData: target world exists: " + target);
+                RaidCraft.LOGGER.info("copyMapData: target world exists: (" + target + ")");
                 return;
             }
+            RaidCraft.LOGGER.info("copyMapData - template: (" + template + ") target: (" + target + ")");
             FileUtils.copyDirectory(src, dest);
             // delete data files
             FileUtils.forceDelete(new File(dest.getAbsoluteFile() + File.separator + "uid.dat"));
@@ -105,11 +107,12 @@ public class WorldManager {
         target.setKeepSpawnInMemory(false); // to unload the world completly
         Bukkit.unloadWorld(target, false);
         RaidCraft.LOGGER.warning("loaded chunks " + target.getLoadedChunks().length);
+        // use bukkit yaml to support List<String>
         completedWorlds.completedWorlds.add(target.getName());
         completedWorlds.save();
     }
 
-    private void deletWorldData(String target) {
+    private void deleteWorldData(String target) {
 
         final File src = new File(Bukkit.getWorldContainer() + File.separator + target);
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -136,6 +139,7 @@ public class WorldManager {
     }
 
     public static boolean isLoaded(String worldName) {
+
         return Bukkit.getWorld(worldName) != null;
     }
 }

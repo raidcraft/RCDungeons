@@ -16,8 +16,6 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import java.util.UUID;
-
 /**
  * @author Silthus
  */
@@ -40,14 +38,15 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     private void load(TDungeonInstance tInstance) {
 
         DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
-        plugin.getDatabase().find(TDungeonInstancePlayer.class)
-                .where().eq("instance_id", tInstance.getId()).findList()
-                .stream().forEach(player -> {
-                    TDungeonPlayer tDungeonPlayer = player.getPlayer();
-                    UUID uuid = tDungeonPlayer.getPlayerId();
-                    addPlayer(plugin.getPlayerManager().getPlayer(uuid));
-                }
-        );
+        // lazy load player, otherwise player load dungeons that don't exists atm
+        //        plugin.getDatabase().find(TDungeonInstancePlayer.class)
+        //                .where().eq("instance_id", tInstance.getId()).findList()
+        //                .stream().forEach(player -> {
+        //                    TDungeonPlayer tDungeonPlayer = player.getPlayer();
+        //                    UUID uuid = tDungeonPlayer.getPlayerId();
+        //                    addPlayer(plugin.getPlayerManager().getPlayer(uuid));
+        //                }
+        //        );
     }
 
     @Override

@@ -2,6 +2,8 @@ package de.raidcraft.dungeons.api;
 
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.DungeonsPlugin;
+import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
+import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -23,7 +25,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
 
     private final int id;
     private final Dungeon dungeon;
-    private final Map<UUID, DungeonPlayer> players = new HashMap<>();
+    private Map<UUID, DungeonPlayer> cachedPlayers = null;
     @Setter
     private boolean active;
     @Setter
@@ -58,7 +60,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public void addPlayer(DungeonPlayer player) {
 
-        players.put(player.getPlayerId(), player);
+        getInternalPlayers().put(player.getPlayerId(), player);
     }
 
     @Override
@@ -73,7 +75,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public DungeonPlayer removePlayer(DungeonPlayer player) {
 
-        return players.remove(player.getPlayerId());
+        return getInternalPlayers().remove(player.getPlayerId());
     }
 
     @Override
@@ -92,7 +94,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public DungeonPlayer removePlayer(UUID playerId) {
 
-        return players.remove(playerId);
+        return getInternalPlayers().remove(playerId);
     }
 
     @Override
@@ -104,13 +106,31 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public boolean containsPlayer(UUID playerId) {
 
-        return players.containsKey(playerId);
+        return getInternalPlayers().containsKey(playerId);
     }
 
     @Override
     public Collection<DungeonPlayer> getPlayers() {
 
-        return players.values();
+        return getInternalPlayers().values();
+    }
+
+    private Map<UUID, DungeonPlayer> getInternalPlayers() {
+
+        if (cachedPlayers == null) {
+            // init cache
+            this.cachedPlayers = new HashMap<>();
+            DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
+            plugin.getDatabase().find(TDungeonInstancePlayer.class)
+                    .where().eq("instance_id", getId()).findList()
+                    .stream().forEach(player -> {
+                        TDungeonPlayer tDungeonPlayer = player.getPlayer();
+                        UUID uuid = tDungeonPlayer.getPlayerId();
+                        cachedPlayers.put(uuid, plugin.getPlayerManager().getPlayer(uuid));
+                    }
+            );
+        }
+        return cachedPlayers;
     }
 
     /**

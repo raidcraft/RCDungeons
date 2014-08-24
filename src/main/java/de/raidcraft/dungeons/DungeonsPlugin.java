@@ -30,7 +30,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 /**
@@ -39,13 +38,12 @@ import java.util.stream.Collectors;
 @Getter
 public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
 
-    private DungeonManager dungeonManager;
-    private InstanceManager instanceManager;
     private PlayerManager playerManager;
+    private DungeonManager dungeonManager;
+    private WorldManager worldManager;
+    private InstanceManager instanceManager;
+
     private LocalConfiguration config;
-    // only allow one intance creation, world creation at once
-    @Getter
-    private Semaphore createWorldLock = new Semaphore(1, true);
 
     @Override
     public void enable() {
@@ -53,6 +51,7 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
         this.config = configure(new LocalConfiguration(this), true);
         this.playerManager = new PlayerManager(this);
         this.dungeonManager = new DungeonManager(this);
+        this.worldManager = new WorldManager(this);
         this.instanceManager = new InstanceManager(this);
         registerCommands(BaseCommands.class);
         registerEvents(new PlayerListener(this));
@@ -67,8 +66,9 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
     public void reload() {
 
         getPlayerManager().reload();
-        getInstanceManager().reload();
         getDungeonManager().reload();
+        getWorldManager().reload();
+        getInstanceManager().reload();
     }
 
     public DungeonManager getDungeonManager() {

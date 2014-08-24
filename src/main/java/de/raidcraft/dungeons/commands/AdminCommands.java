@@ -100,7 +100,7 @@ public class AdminCommands {
     @Command(
             aliases = {"end"},
             desc = "close the instance",
-            usage = "<player>"
+            usage = "[player_name]"
     )
     @CommandPermissions("rcdungeons.admin.end")
     public void end(CommandContext args, CommandSender sender) throws CommandException {

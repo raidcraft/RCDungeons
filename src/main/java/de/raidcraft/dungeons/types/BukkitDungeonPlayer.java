@@ -35,7 +35,7 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
         DungeonManager dungeonManager = RaidCraft.getComponent(DungeonManager.class);
         for (TDungeonInstancePlayer instance : player.getInstances()) {
             // only load active instances
-            if(instance.getInstance().isCompleted() ||
+            if (instance.getInstance().isCompleted() ||
                     instance.getInstance().isLocked()) {
                 continue;
             }
@@ -73,7 +73,8 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
 
     @Override
     public void removeDungeonInstance(DungeonInstance newInstance) {
-       this.instances.remove(newInstance.getDungeon());
+
+        this.instances.remove(newInstance.getDungeon());
     }
 
     @Override
@@ -107,13 +108,16 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
 
         EbeanServer database = RaidCraft.getDatabase(DungeonsPlugin.class);
         TDungeonPlayer player = database.find(TDungeonPlayer.class, getId());
+
         Location position = getLastPosition();
-        player.setLastWorld(position.getWorld().getName());
-        player.setLastX(position.getX());
-        player.setLastY(position.getY());
-        player.setLastZ(position.getZ());
-        player.setLastYaw((long) position.getYaw());
-        player.setLastPitch((long) position.getPitch());
+        if (position != null) {
+            player.setLastWorld(position.getWorld().getName());
+            player.setLastX(position.getX());
+            player.setLastY(position.getY());
+            player.setLastZ(position.getZ());
+            player.setLastYaw((long) position.getYaw());
+            player.setLastPitch((long) position.getPitch());
+        }
         // save only instance, don't save the player in the instances
         for (DungeonInstance instance : getDungeonInstances()) {
             instance.save();

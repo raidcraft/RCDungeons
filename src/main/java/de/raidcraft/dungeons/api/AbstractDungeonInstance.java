@@ -1,9 +1,12 @@
 package de.raidcraft.dungeons.api;
 
+import de.raidcraft.RaidCraft;
+import de.raidcraft.dungeons.DungeonsPlugin;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -103,5 +106,17 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     public Collection<DungeonPlayer> getPlayers() {
 
         return players.values();
+    }
+
+    /**
+     * World must exist
+     *
+     * @return the loaded world
+     */
+    @Override
+    public World loadWorld() {
+
+        return RaidCraft.getComponent(DungeonsPlugin.class).getWorldManager()
+                .loadWorld(getDungeon().getSpawnLocation(),getWorldName());
     }
 }

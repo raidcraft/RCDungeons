@@ -58,6 +58,7 @@ public class PlayerListener implements Listener {
                             uuids.toArray(new UUID[uuids.size()]));
                 }
                 player.teleport(instance.getWorld().getSpawnLocation());
+                player.sendMessage("Welcome in " + instance.getWorld().getName());
             } catch (DungeonException e) {
                 e.printStackTrace();
             }

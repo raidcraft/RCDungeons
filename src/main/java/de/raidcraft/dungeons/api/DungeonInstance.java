@@ -33,6 +33,8 @@ public interface DungeonInstance {
      */
     public World getWorld();
 
+    public String getWorldName(); // to get the world without load it
+
     /**
      * Loads the world that was created for the dungeon, so that players can enter it.
      */

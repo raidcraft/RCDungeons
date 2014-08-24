@@ -5,12 +5,11 @@ import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.api.DungeonReason;
-import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
+import de.raidcraft.dungeons.util.DungeonUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -57,22 +56,9 @@ public class InstanceManager {
         return instances.get(instanceId);
     }
 
-    public boolean instanceExists(int instanceId) {
-
-        try {
-            plugin.getCreateWorldLock().acquire();
-            return instances.containsKey(instanceId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            plugin.getCreateWorldLock().release();
-        }
-        return false;
-    }
-
     public DungeonInstance createDungeonInstance(Dungeon dungeon, UUID... players) {
 
-        //        prepare an initial table entry to provide a valid id to the new dungeon instance
+        // prepare an initial table entry to provide a valid id to the new dungeon instance
         TDungeonInstance tableEntry = new TDungeonInstance();
         tableEntry.setDungeon(plugin.getDatabase().find(TDungeon.class, dungeon.getId()));
         tableEntry.setCompleted(false);
@@ -91,32 +77,24 @@ public class InstanceManager {
         }
         instance.save();
         addInstance(instance);
-        // load the world
+        // create the world async (!)
         createInstanceWorld(instance, instance.getWorldName());
-        // TODO: teleport the players ?
-        // Arrays.stream(players).forEach();
         return instance;
     }
 
-    private World createInstanceWorld(DungeonInstance instance, String worldName) {
+    private void createInstanceWorld(DungeonInstance instance, String worldName) {
 
         try {
-            plugin.getCreateWorldLock().acquire();
             // get Template Dungeon
             Dungeon dungeon = instance.getDungeon();
-            Location spawn = dungeon.getSpawnLocation();
-            // create new chunk generator
-            DungeonWorldCreator creator = new DungeonWorldCreator(worldName, spawn);
-            // copy template world
-            WorldManager.copyMapData(dungeon.getTemplateWorldName(), worldName);
-            // load map
-            return Bukkit.createWorld(creator);
+            // copy template world  map data async (!)
+            plugin.getWorldManager().copyAsyncMapData(
+                    DungeonUtils.getTemplateWorldName(dungeon.getName()),
+                    worldName,
+                    dungeon.getSpawnLocation());
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            plugin.getCreateWorldLock().release();
         }
-        return null;
     }
 
     public DungeonInstance getInstance(World world) {
@@ -154,7 +132,7 @@ public class InstanceManager {
 
         instance.getPlayers().stream().forEach(player -> player.removeDungeonInstance(instance));
         // delete world
-        WorldManager.deleteWorld(instance.getWorld());
+        plugin.getWorldManager().deleteWorld(instance.getWorld());
     }
 
     public void reload() {

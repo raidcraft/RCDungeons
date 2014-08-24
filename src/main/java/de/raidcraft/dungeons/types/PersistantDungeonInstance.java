@@ -3,19 +3,16 @@ package de.raidcraft.dungeons.types;
 import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.DungeonsPlugin;
-import de.raidcraft.dungeons.WorldManager;
 import de.raidcraft.dungeons.api.AbstractDungeonInstance;
 import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.api.DungeonReason;
-import de.raidcraft.dungeons.creator.DungeonWorldCreator;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.util.DungeonUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.UUID;
@@ -57,21 +54,10 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
         World world = Bukkit.getWorld(this.worldName);
         if (world == null) {
-            world = loadWorld();
+            RaidCraft.getComponent(DungeonsPlugin.class).getLogger()
+                    .warning("World not loaded: (" + this.worldName + ")");
         }
         return world;
-    }
-
-    @Override
-    public World loadWorld() {
-
-        Location spawn = getDungeon().getSpawnLocation();
-        // create new chunk generator
-        DungeonWorldCreator creator = new DungeonWorldCreator(this.worldName, spawn);
-        // copy template world
-        WorldManager.copyMapData(DungeonUtils.getTemplateWorldName(getDungeon().getName()), this.worldName);
-        // load map
-        return Bukkit.createWorld(creator);
     }
 
     @Override
@@ -98,7 +84,9 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
     public void save() {
 
         // save the world first
-        getWorld().save();
+        if (getWorld() != null) {
+            getWorld().save();
+        }
         // now save stuff to the database
         EbeanServer database = RaidCraft.getDatabase(DungeonsPlugin.class);
         TDungeonInstance instance = database.find(TDungeonInstance.class, getId());

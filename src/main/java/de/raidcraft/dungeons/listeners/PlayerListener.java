@@ -61,6 +61,20 @@ public class PlayerListener implements Listener {
             } catch (DungeonException e) {
                 e.printStackTrace();
             }
+            return;
+        }
+        if (event.getCause().equals(DungeonConnect.CONTINUE_INSTACE)) {
+            Player player = event.getPlayer();
+            DungeonPlayer dungeonPlayer = plugin.getPlayerManager().getPlayer(player.getUniqueId());
+            DungeonInstance instance = dungeonPlayer.getActiveInstance();
+            if (instance != null) {
+                // TODO: load world maybe?
+                plugin.getPlayerManager().queuePlayerForInstance(player, instance);
+            } else {
+                player.sendMessage("No active instance found");
+                event.setCancelled(true);
+            }
+            return;
         }
     }
 }

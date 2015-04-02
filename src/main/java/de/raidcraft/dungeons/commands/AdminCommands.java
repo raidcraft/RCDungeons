@@ -17,6 +17,8 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Optional;
+
 /**
  * @author Silthus
  */
@@ -108,11 +110,11 @@ public class AdminCommands {
     public void end(CommandContext args, CommandSender sender) throws CommandException {
 
         Player player = args.argsLength() == 1 ? CommandUtil.grabPlayer(args.getString(0)) : (Player) sender;
-        DungeonInstance instance = plugin.getInstanceManager().getInstance(player.getWorld());
-        if (instance == null) {
+        Optional<DungeonInstance> instance = plugin.getInstanceManager().getInstance(player.getWorld());
+        if (!instance.isPresent()) {
             throw new CommandException("You are not in a instance");
         }
-        plugin.end(instance, DungeonReason.FINISH);
+        plugin.end(instance.get(), DungeonReason.FINISH);
     }
 
 
@@ -124,10 +126,11 @@ public class AdminCommands {
     public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
 
         Player player = (Player) sender;
-        Dungeon dungeon = plugin.getDungeonManager().getDungeon(player.getWorld());
-        if (dungeon == null) {
+        Optional<Dungeon> optional = plugin.getDungeonManager().getDungeon(player.getWorld());
+        if (!optional.isPresent()) {
             throw new CommandException("You are not in a template dungeon");
         }
+        Dungeon dungeon = optional.get();
         TDungeonSpawn spawn = plugin.getDatabase().find(TDungeonSpawn.class)
                 .where().eq("dungeon_id", dungeon.getId()).findUnique();
         spawn.setSpawn(player.getLocation());

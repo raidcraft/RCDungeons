@@ -29,6 +29,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -195,5 +196,29 @@ public class DungeonsPlugin extends BasePlugin implements DungeonAPI {
     public void exit(Player player) {
 
         RaidCraft.getComponent(ConnectPlugin.class).teleportBack(player);
+    }
+
+    @Override
+    public boolean isDungeonTemplate(World world) {
+
+        return getDungeonManager().getDungeon(world).isPresent();
+    }
+
+    @Override
+    public boolean isDungeonInstance(World world) {
+
+        return getInstanceManager().getInstance(world).isPresent();
+    }
+
+    @Override
+    public Optional<DungeonInstance> getDungeonInstance(World world) {
+
+        return getInstanceManager().getInstance(world);
+    }
+
+    @Override
+    public Optional<Dungeon> getDungeon(World world) {
+
+        return getDungeonManager().getDungeon(world);
     }
 }

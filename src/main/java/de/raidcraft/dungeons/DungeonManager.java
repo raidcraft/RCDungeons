@@ -23,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -63,14 +64,14 @@ public class DungeonManager implements Component {
         }
     }
 
-    public Dungeon getDungeon(World world) {
+    public Optional<Dungeon> getDungeon(World world) {
 
         for (Dungeon dungeon : dungeons.values()) {
             if (world.getName().equals(dungeon.getTemplateWorldName())) {
-                return dungeon;
+                return Optional.ofNullable(dungeon);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public Dungeon getDungeon(String name) throws DungeonException {

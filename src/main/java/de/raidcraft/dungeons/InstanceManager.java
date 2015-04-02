@@ -23,6 +23,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -106,14 +107,14 @@ public class InstanceManager implements Listener {
         }
     }
 
-    public DungeonInstance getInstance(World world) {
+    public Optional<DungeonInstance> getInstance(World world) {
 
         for (DungeonInstance instance : instances.values()) {
             if (world.getName().equalsIgnoreCase(instance.getWorldName())) {
-                return instance;
+                return Optional.ofNullable(instance);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public void end(DungeonInstance instance, DungeonReason reason) {

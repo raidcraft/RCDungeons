@@ -1,6 +1,9 @@
 package de.raidcraft.dungeons.api;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import java.util.Optional;
 
 /**
  * @author Dragonfire
@@ -16,4 +19,12 @@ public interface DungeonAPI {
     public void end(DungeonInstance instance, DungeonReason reason);
 
     public void exit(Player player);
+
+    public boolean isDungeonTemplate(World world);
+
+    public boolean isDungeonInstance(World world);
+
+    public Optional<DungeonInstance> getDungeonInstance(World world);
+
+    public Optional<Dungeon> getDungeon(World world);
 }

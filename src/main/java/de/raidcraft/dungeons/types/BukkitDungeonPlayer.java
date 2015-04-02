@@ -1,14 +1,16 @@
-package de.raidcraft.dungeons;
+package de.raidcraft.dungeons.types;
 
 import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
+import de.raidcraft.dungeons.DungeonManager;
+import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.AbstractDungeonPlayer;
 import de.raidcraft.dungeons.api.Dungeon;
+import de.raidcraft.dungeons.api.DungeonException;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
-import de.raidcraft.dungeons.types.PersistantDungeonInstance;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -28,10 +30,15 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
 
     public BukkitDungeonPlayer(TDungeonPlayer player) {
 
-        super(player.getId(), player.getPlayer());
+        super(player.getId(), player.getPlayerId());
         setLastPosition(player.getLastPosition());
         DungeonManager dungeonManager = RaidCraft.getComponent(DungeonManager.class);
         for (TDungeonInstancePlayer instance : player.getInstances()) {
+            // only load active instances
+            if (instance.getInstance().isCompleted() ||
+                    instance.getInstance().isLocked()) {
+                continue;
+            }
             try {
                 PersistantDungeonInstance dungeonInstance =
                         new PersistantDungeonInstance(instance.getInstance(), dungeonManager.getDungeon(instance.getInstance().getDungeon().getName()));
@@ -41,6 +48,7 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
                 }
             } catch (DungeonException e) {
                 RaidCraft.LOGGER.warning(e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -58,16 +66,35 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
     }
 
     @Override
+    public void addDungeonInstance(DungeonInstance newInstance) {
+
+        this.instances.put(newInstance.getDungeon(), newInstance);
+    }
+
+    @Override
+    public void removeDungeonInstance(DungeonInstance newInstance) {
+
+        this.instances.remove(newInstance.getDungeon());
+    }
+
+    @Override
     public DungeonInstance getActiveInstance() {
 
         return activeInstance;
     }
 
     @Override
+    public void setActiveDungeonInstance(DungeonInstance activeInstance) {
+
+        addDungeonInstance(activeInstance);
+        this.activeInstance = activeInstance;
+    }
+
+    @Override
     public void leaveActiveDungeon(DungeonReason reason) {
 
         if (getActiveInstance() != null) {
-            Player player = Bukkit.getPlayer(getName());
+            Player player = Bukkit.getPlayer(getPlayerId());
             if (player != null) {
                 player.teleport(getLastPosition());
             }
@@ -81,13 +108,17 @@ public class BukkitDungeonPlayer extends AbstractDungeonPlayer {
 
         EbeanServer database = RaidCraft.getDatabase(DungeonsPlugin.class);
         TDungeonPlayer player = database.find(TDungeonPlayer.class, getId());
+
         Location position = getLastPosition();
-        player.setLastWorld(position.getWorld().getName());
-        player.setLastX(position.getX());
-        player.setLastY(position.getY());
-        player.setLastZ(position.getZ());
-        player.setLastYaw((long) position.getYaw());
-        player.setLastPitch((long) position.getPitch());
+        if (position != null) {
+            player.setLastWorld(position.getWorld().getName());
+            player.setLastX(position.getX());
+            player.setLastY(position.getY());
+            player.setLastZ(position.getZ());
+            player.setLastYaw((long) position.getYaw());
+            player.setLastPitch((long) position.getPitch());
+        }
+        // save only instance, don't save the player in the instances
         for (DungeonInstance instance : getDungeonInstances()) {
             instance.save();
         }

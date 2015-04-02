@@ -19,10 +19,15 @@ public class DungeonWorldCreator extends WorldCreator {
 
         super(name);
         generator(new ChunkGenerator() {
+            private Location newSpawn;
+
             @Override
             public Location getFixedSpawnLocation(World world, Random random) {
 
-                return spawn;
+                if (newSpawn == null) {
+                    return super.getFixedSpawnLocation(world, random);
+                }
+                return new Location(world, newSpawn.getX(), newSpawn.getX(), newSpawn.getZ());
             }
 
             @Override
@@ -35,6 +40,13 @@ public class DungeonWorldCreator extends WorldCreator {
             public List<BlockPopulator> getDefaultPopulators(World world) {
 
                 return new ArrayList<>();
+            }
+
+            @Override
+            @Deprecated
+            public byte[][] generateBlockSections(World world, Random random, int x, int z, BiomeGrid biomes) {
+
+                return new byte[world.getMaxHeight() / 16][]; //world height / chunk part height (=16, look above)
             }
         });
     }

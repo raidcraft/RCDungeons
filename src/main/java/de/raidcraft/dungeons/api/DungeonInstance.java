@@ -2,8 +2,9 @@ package de.raidcraft.dungeons.api;
 
 import org.bukkit.World;
 
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author Silthus
@@ -30,7 +31,9 @@ public interface DungeonInstance {
      *
      * @return unique world for the dungeon instance
      */
-    public World getWorld();
+    public World getWorld() throws WorldNotLoadedExpcetion;
+
+    public String getWorldName(); // to get the world without load it
 
     /**
      * Loads the world that was created for the dungeon, so that players can enter it.
@@ -60,7 +63,7 @@ public interface DungeonInstance {
      *
      * @return creation time
      */
-    public Timestamp getCreationTime();
+    public Date getCreationTime();
 
     public void teleport(DungeonPlayer player);
 
@@ -77,6 +80,7 @@ public interface DungeonInstance {
      * Removes the vien player from the dungeon instance if he is in it.
      *
      * @param player to remove from the instance
+     *
      * @return true if player was removed, false if he wasn't in the dungeon
      */
     public DungeonPlayer removePlayer(DungeonPlayer player);
@@ -86,16 +90,18 @@ public interface DungeonInstance {
     /**
      * Removes the vien player from the dungeon instance if he is in it.
      *
-     * @param player to remove from the instance
+     * @param playerId to remove from the instance
+     *
      * @return true if player was removed, false if he wasn't in the dungeon
      */
-    public DungeonPlayer removePlayer(String player);
+    public DungeonPlayer removePlayer(UUID playerId);
 
     /**
      * Checks if the dungeon instance contains the player. Will also return true if
      * the player is not in the instance and only registered for it.
      *
      * @param player to check for
+     *
      * @return true if player is registered in this instance
      */
     public boolean containsPlayer(DungeonPlayer player);
@@ -104,10 +110,11 @@ public interface DungeonInstance {
      * Checks if the dungeon instance contains the player. Will also return true if
      * the player is not in the instance and only registered for it.
      *
-     * @param player to check for
+     * @param playerId to check for
+     *
      * @return true if player is registered in this instance
      */
-    public boolean containsPlayer(String player);
+    public boolean containsPlayer(UUID playerId);
 
     /**
      * Gets all players that are attached to this instance.

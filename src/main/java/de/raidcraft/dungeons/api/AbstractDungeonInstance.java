@@ -1,26 +1,38 @@
 package de.raidcraft.dungeons.api;
 
-import de.raidcraft.util.CaseInsensitiveMap;
+import de.raidcraft.RaidCraft;
+import de.raidcraft.dungeons.DungeonsPlugin;
+import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
+import de.raidcraft.dungeons.tables.TDungeonPlayer;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Silthus
  */
+@Getter
 public abstract class AbstractDungeonInstance implements DungeonInstance {
 
     private final int id;
     private final Dungeon dungeon;
-    private final Map<String, DungeonPlayer> players = new CaseInsensitiveMap<>();
+    private Map<UUID, DungeonPlayer> cachedPlayers = null;
+    @Setter
     private boolean active;
+    @Setter
     private boolean completed;
+    @Setter
     private boolean locked;
-    protected Timestamp creationTime;
+    protected Date creationTime;
 
     public AbstractDungeonInstance(int id, Dungeon dungeon) {
 
@@ -29,39 +41,26 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     }
 
     @Override
-    public int getId() {
-
-        return id;
-    }
-
-    @Override
-    public Dungeon getDungeon() {
-
-        return dungeon;
-    }
-
-    @Override
-    public Timestamp getCreationTime() {
-
-        return creationTime;
-    }
-
-    @Override
     public void teleport(DungeonPlayer player) {
 
-        Player bukkitPlayer = Bukkit.getPlayer(player.getName());
+        // TODO: duplicated, see PlayerManager
+        Player bukkitPlayer = Bukkit.getPlayer(player.getPlayerId());
         if (bukkitPlayer != null) {
             player.setLastPosition(bukkitPlayer.getLocation());
             Location spawnLocation = getDungeon().getSpawnLocation();
-            spawnLocation.setWorld(getWorld());
-            bukkitPlayer.teleport(spawnLocation);
+            try {
+                spawnLocation.setWorld(getWorld());
+                bukkitPlayer.teleport(spawnLocation);
+            } catch (WorldNotLoadedExpcetion e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
     public void addPlayer(DungeonPlayer player) {
 
-        players.put(player.getName(), player);
+        getInternalPlayers().put(player.getPlayerId(), player);
     }
 
     @Override
@@ -76,7 +75,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     @Override
     public DungeonPlayer removePlayer(DungeonPlayer player) {
 
-        return removePlayer(player.getName());
+        return getInternalPlayers().remove(player.getPlayerId());
     }
 
     @Override
@@ -84,7 +83,7 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
 
         DungeonPlayer dungeonPlayer = removePlayer(player);
         if (teleport) {
-            Player bPlayer = Bukkit.getPlayer(player.getName());
+            Player bPlayer = Bukkit.getPlayer(player.getPlayerId());
             if (bPlayer != null) {
                 bPlayer.teleport(player.getLastPosition());
             }
@@ -93,62 +92,56 @@ public abstract class AbstractDungeonInstance implements DungeonInstance {
     }
 
     @Override
-    public DungeonPlayer removePlayer(String player) {
+    public DungeonPlayer removePlayer(UUID playerId) {
 
-        return players.remove(player);
+        return getInternalPlayers().remove(playerId);
     }
 
     @Override
     public boolean containsPlayer(DungeonPlayer player) {
 
-        return containsPlayer(player.getName());
+        return containsPlayer(player.getPlayerId());
     }
 
     @Override
-    public boolean containsPlayer(String player) {
+    public boolean containsPlayer(UUID playerId) {
 
-        return players.containsKey(player);
+        return getInternalPlayers().containsKey(playerId);
     }
 
     @Override
     public Collection<DungeonPlayer> getPlayers() {
 
-        return players.values();
+        return getInternalPlayers().values();
     }
 
-    @Override
-    public boolean isActive() {
+    private Map<UUID, DungeonPlayer> getInternalPlayers() {
 
-        return active;
+        if (cachedPlayers == null) {
+            // init cache
+            this.cachedPlayers = new HashMap<>();
+            DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
+            plugin.getDatabase().find(TDungeonInstancePlayer.class)
+                    .where().eq("instance_id", getId()).findList()
+                    .stream().forEach(player -> {
+                        TDungeonPlayer tDungeonPlayer = player.getPlayer();
+                        UUID uuid = tDungeonPlayer.getPlayerId();
+                        cachedPlayers.put(uuid, plugin.getPlayerManager().getPlayer(uuid));
+                    }
+            );
+        }
+        return cachedPlayers;
     }
 
+    /**
+     * World must exist
+     *
+     * @return the loaded world
+     */
     @Override
-    public void setActive(boolean active) {
+    public World loadWorld() {
 
-        this.active = active;
-    }
-
-    @Override
-    public boolean isCompleted() {
-
-        return completed;
-    }
-
-    @Override
-    public void setCompleted(boolean completed) {
-
-        this.completed = completed;
-    }
-
-    @Override
-    public boolean isLocked() {
-
-        return locked || getDungeon().isLocked();
-    }
-
-    @Override
-    public void setLocked(boolean locked) {
-
-        this.locked = locked;
+        return RaidCraft.getComponent(DungeonsPlugin.class).getWorldManager()
+                .loadWorld(getDungeon().getSpawnLocation(), getWorldName());
     }
 }

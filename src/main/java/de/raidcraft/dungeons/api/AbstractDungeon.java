@@ -1,17 +1,27 @@
 package de.raidcraft.dungeons.api;
 
+import de.raidcraft.RaidCraft;
+import de.raidcraft.dungeons.DungeonsPlugin;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Silthus
  */
+@Getter
+@Setter
 public abstract class AbstractDungeon implements Dungeon {
 
     private final int id;
     private final String name;
     private String friendlyName;
     private String description;
-    private long resetTime;
+    private long resetTimeMillis;
     private Location spawnLocation;
     private boolean locked;
 
@@ -22,74 +32,28 @@ public abstract class AbstractDungeon implements Dungeon {
     }
 
     @Override
-    public int getId() {
+    public DungeonInstance createInstance(UUID... players) {
 
-        return id;
+        return RaidCraft.getComponent(DungeonsPlugin.class).getInstanceManager()
+                .createDungeonInstance(this, players);
     }
 
     @Override
-    public String getName() {
+    public List<DungeonInstance> getActiveInstances() {
 
-        return name;
+        return getInstances().stream()
+                .filter(DungeonInstance::isActive)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public String getFriendlyName() {
+    public DungeonInstance getActiveInstance(UUID player) {
 
-        return friendlyName;
-    }
-
-    @Override
-    public void setFriendlyName(String friendlyName) {
-
-        this.friendlyName = friendlyName;
-    }
-
-    @Override
-    public String getDescription() {
-
-        return description;
-    }
-
-    @Override
-    public void setDescription(String description) {
-
-        this.description = description;
-    }
-
-    @Override
-    public long getResetTimeMillis() {
-
-        return resetTime;
-    }
-
-    @Override
-    public void setResetTimeMillis(long resetTime) {
-
-        this.resetTime = resetTime;
-    }
-
-    @Override
-    public Location getSpawnLocation() {
-
-        return spawnLocation;
-    }
-
-    @Override
-    public void setSpawnLocation(Location location) {
-
-        this.spawnLocation = location;
-    }
-
-    @Override
-    public boolean isLocked() {
-
-        return locked;
-    }
-
-    @Override
-    public void setLocked(boolean locked) {
-
-        this.locked = locked;
+        for (DungeonInstance instance : getActiveInstances()) {
+            if (instance.containsPlayer(player)) {
+                return instance;
+            }
+        }
+        return null;
     }
 }

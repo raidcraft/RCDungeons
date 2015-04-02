@@ -1,43 +1,25 @@
 package de.raidcraft.dungeons.api;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
+
+import java.util.UUID;
 
 /**
  * @author Silthus
  */
+@Getter
 public abstract class AbstractDungeonPlayer implements DungeonPlayer {
 
     private final int id;
-    private final String name;
+    private final UUID playerId;
+    @Setter
     private Location lastPosition;
 
-    public AbstractDungeonPlayer(int id, String name) {
+    public AbstractDungeonPlayer(int id, UUID playerId) {
 
         this.id = id;
-        this.name = name;
-    }
-
-    @Override
-    public int getId() {
-
-        return id;
-    }
-
-    @Override
-    public String getName() {
-
-        return name;
-    }
-
-    @Override
-    public Location getLastPosition() {
-
-        return lastPosition;
-    }
-
-    @Override
-    public void setLastPosition(Location lastPosition) {
-
-        this.lastPosition = lastPosition;
+        this.playerId = playerId;
     }
 }

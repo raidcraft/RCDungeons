@@ -5,8 +5,10 @@ import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import de.raidcraft.dungeons.DungeonsPlugin;
+import de.raidcraft.dungeons.api.Dungeon;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonReason;
+import de.raidcraft.dungeons.tables.TDungeonSpawn;
 import de.raidcraft.util.CommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -113,25 +115,24 @@ public class AdminCommands {
         plugin.end(instance, DungeonReason.FINISH);
     }
 
-    // not working: OptimisticLockException: Data has changed
 
-    //    @Command(
-    //            aliases = {"setspawn"},
-    //            desc = "set the spawn point of the tempate to your current location"
-    //    )
-    //    @CommandPermissions("rcdungeons.admin.end")
-    //    public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
-    //
-    //        Player player = (Player) sender;
-    //        Dungeon dungeon = plugin.getDungeonManager().getDungeon(player.getWorld());
-    //        if (dungeon == null) {
-    //            throw new CommandException("You are not in a template dungeon");
-    //        }
-    //        TDungeonSpawn spawn = plugin.getDatabase().find(TDungeonSpawn.class)
-    //                .where().eq("dungeon_id", dungeon.getId()).findUnique();
-    //        spawn.setSpawn(player.getLocation());
-    //        plugin.getDatabase().update(spawn);
-    //        dungeon.setSpawnLocation(player.getLocation());
-    //        dungeon.save();
-    //    }
+    @Command(
+            aliases = {"setspawn"},
+            desc = "set the spawn point of the tempate to your current location"
+    )
+    @CommandPermissions("rcdungeons.admin.end")
+    public void setspawn(CommandContext args, CommandSender sender) throws CommandException {
+
+        Player player = (Player) sender;
+        Dungeon dungeon = plugin.getDungeonManager().getDungeon(player.getWorld());
+        if (dungeon == null) {
+            throw new CommandException("You are not in a template dungeon");
+        }
+        TDungeonSpawn spawn = plugin.getDatabase().find(TDungeonSpawn.class)
+                .where().eq("dungeon_id", dungeon.getId()).findUnique();
+        spawn.setSpawn(player.getLocation());
+        plugin.getDatabase().update(spawn);
+        dungeon.setSpawnLocation(player.getLocation());
+        dungeon.save();
+    }
 }

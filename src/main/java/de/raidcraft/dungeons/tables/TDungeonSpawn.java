@@ -23,9 +23,9 @@ public class TDungeonSpawn {
     private int id;
     @ManyToOne
     private TDungeon dungeon;
-    private double spawnX;
-    private double spawnY;
-    private double spawnZ;
+    private int spawnX;
+    private int spawnY;
+    private int spawnZ;
     private float spawnYaw;
     private float spawnPitch;
 
@@ -35,24 +35,24 @@ public class TDungeonSpawn {
 
     public TDungeonSpawn(Location location) {
 
-        this.spawnX = location.getX();
-        this.spawnY = location.getY();
-        this.spawnZ = location.getZ();
+        this.spawnX = location.getBlockX();
+        this.spawnY = location.getBlockY();
+        this.spawnZ = location.getBlockZ();
         this.spawnYaw = location.getYaw();
         this.spawnPitch = location.getPitch();
     }
 
     public Location getLocation() {
 
-        return new Location(Bukkit.getWorld("default"), spawnX, spawnY, spawnZ, spawnYaw, spawnPitch);
+        return new Location(Bukkit.getWorld("default"), (double) spawnX, (double) spawnY, (double) spawnZ, spawnYaw, spawnPitch);
     }
 
     public void setSpawn(Location loc) {
 
         setSpawnPitch(loc.getPitch());
-        setSpawnX(loc.getX());
-        setSpawnY(loc.getY());
+        setSpawnX(loc.getBlockX());
+        setSpawnY(loc.getBlockY());
         setSpawnYaw(loc.getYaw());
-        setSpawnZ(loc.getZ());
+        setSpawnZ(loc.getBlockZ());
     }
 }

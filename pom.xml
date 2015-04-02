@@ -31,7 +31,7 @@
     <parent>
         <groupId>de.raidcraft</groupId>
         <artifactId>masterpom</artifactId>
-        <version>RELEASE</version>
+        <version>4.1.0</version>
     </parent>
 
     <repositories>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>de.raidcraft</groupId>
             <artifactId>raidcraft-api</artifactId>
-            <version>${rc.version}</version>
+            <version>1.6.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.raidcraft</groupId>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldedit</artifactId>
-            <version>${rc.version}</version>
+            <version>6.0.0-rc-beta-01</version>
         </dependency>
     </dependencies>
 </project>

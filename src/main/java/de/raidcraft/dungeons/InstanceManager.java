@@ -7,7 +7,7 @@ import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.api.DungeonReason;
 import de.raidcraft.dungeons.api.WorldNotLoadedExpcetion;
-import de.raidcraft.dungeons.api.raidcraftevents.RE_InstanceLoadedEvent;
+import de.raidcraft.dungeons.api.events.RCDungeonInstanceLoadedEvent;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.types.PersistantDungeonInstance;
@@ -145,7 +145,7 @@ public class InstanceManager implements Listener {
         try {
             plugin.getWorldManager().deleteWorld(instance.getWorld());
         } catch (WorldNotLoadedExpcetion e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -179,6 +179,6 @@ public class InstanceManager implements Listener {
         if (instance == null) {
             plugin.getLogger().warning("instance not loaded for world: (" + world.getName() + ")");
         }
-        RaidCraft.callEvent(new RE_InstanceLoadedEvent(world, instance));
+        RaidCraft.callEvent(new RCDungeonInstanceLoadedEvent(world, instance));
     }
 }

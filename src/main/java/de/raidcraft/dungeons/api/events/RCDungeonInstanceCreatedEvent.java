@@ -1,4 +1,4 @@
-package de.raidcraft.dungeons.api.raidcraftevents;
+package de.raidcraft.dungeons.api.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -6,11 +6,11 @@ import org.bukkit.event.HandlerList;
 /**
  * @author Dragonfire
  */
-public class RE_InstanceCreatedEvent extends Event {
+public class RCDungeonInstanceCreatedEvent extends Event {
 
     private String worldName;
 
-    public RE_InstanceCreatedEvent(String worldName) {
+    public RCDungeonInstanceCreatedEvent(String worldName) {
 
         this.worldName = worldName;
     }

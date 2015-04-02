@@ -2,7 +2,7 @@ package de.raidcraft.dungeons.listeners;
 
 import de.raidcraft.RaidCraft;
 import de.raidcraft.connect.ConnectPlugin;
-import de.raidcraft.connect.api.raidcraftevents.RE_PlayerSwitchServer;
+import de.raidcraft.connect.api.events.RCPlayerChangeServerEvent;
 import de.raidcraft.connect.commands.DungeonConnect;
 import de.raidcraft.connect.tables.TConnectPlayer;
 import de.raidcraft.dungeons.DungeonsPlugin;
@@ -33,7 +33,7 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void join(RE_PlayerSwitchServer event) {
+    public void join(RCPlayerChangeServerEvent event) {
 
         if (event.isInvalid()) {
             plugin.getLogger().warning("Invalid server join of ("

@@ -55,6 +55,7 @@ public class TDungeonPlayer {
     }
 
     public void init(Player bukkitPlayer) {
+
         Location loc = bukkitPlayer.getLocation();
         setLastPitch(loc.getPitch());
         setLastYaw(loc.getYaw());

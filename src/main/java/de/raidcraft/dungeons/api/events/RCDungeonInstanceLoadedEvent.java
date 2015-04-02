@@ -1,4 +1,4 @@
-package de.raidcraft.dungeons.api.raidcraftevents;
+package de.raidcraft.dungeons.api.events;
 
 import de.raidcraft.dungeons.api.DungeonInstance;
 import lombok.Getter;
@@ -10,12 +10,12 @@ import org.bukkit.event.HandlerList;
  * @author Dragonfire
  */
 @Getter
-public class RE_InstanceLoadedEvent extends Event {
+public class RCDungeonInstanceLoadedEvent extends Event {
 
     private World world;
     private DungeonInstance instance;
 
-    public RE_InstanceLoadedEvent(World world, DungeonInstance instance) {
+    public RCDungeonInstanceLoadedEvent(World world, DungeonInstance instance) {
 
         this.world = world;
         this.instance = instance;

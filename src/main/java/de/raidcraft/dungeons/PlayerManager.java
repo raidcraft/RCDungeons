@@ -3,7 +3,7 @@ package de.raidcraft.dungeons;
 import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.api.DungeonPlayer;
 import de.raidcraft.dungeons.api.WorldNotLoadedExpcetion;
-import de.raidcraft.dungeons.api.raidcraftevents.RE_InstanceLoadedEvent;
+import de.raidcraft.dungeons.api.events.RCDungeonInstanceLoadedEvent;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.types.BukkitDungeonPlayer;
 import de.raidcraft.reference.Colors;
@@ -93,7 +93,7 @@ public class PlayerManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void instanceLoaded(RE_InstanceLoadedEvent event) {
+    public void instanceLoaded(RCDungeonInstanceLoadedEvent event) {
 
         event.getInstance().getPlayers().stream().forEach(dungeonPlayer -> {
             Player bukkitPlayer = Bukkit.getPlayer(dungeonPlayer.getPlayerId());

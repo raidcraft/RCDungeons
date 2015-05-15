@@ -16,14 +16,14 @@ public interface DungeonInstance {
      *
      * @return database id
      */
-    public int getId();
+    int getId();
 
     /**
      * Gets the dungeon template this instance was created of.
      *
      * @return dungeon the instance is attached to
      */
-    public Dungeon getDungeon();
+    Dungeon getDungeon();
 
     /**
      * Gets the world the dungeon was created in. Each dungeon instance has
@@ -31,14 +31,14 @@ public interface DungeonInstance {
      *
      * @return unique world for the dungeon instance
      */
-    public World getWorld() throws WorldNotLoadedExpcetion;
+    World getWorld() throws WorldNotLoadedExpcetion;
 
-    public String getWorldName(); // to get the world without load it
+    String getWorldName(); // to get the world without load it
 
     /**
      * Loads the world that was created for the dungeon, so that players can enter it.
      */
-    public World loadWorld();
+    World loadWorld();
 
     /**
      * Unloads the world from memory. Useful to save memory when players are not playing the dungeon.
@@ -47,7 +47,7 @@ public interface DungeonInstance {
      *
      * @return true if world was unloaded, false if world could not be unloaded
      */
-    public boolean unload(boolean force);
+    boolean unload(boolean force);
 
     /**
      * Unloads the dungeon instance and then deletes the world from the harddisk.
@@ -56,25 +56,25 @@ public interface DungeonInstance {
      *
      * @return true if deletion of the world was successful
      */
-    public boolean delete(boolean force);
+    boolean delete(boolean force);
 
     /**
      * Gets the time the instance was created
      *
      * @return creation time
      */
-    public Date getCreationTime();
+    Date getCreationTime();
 
-    public void teleport(DungeonPlayer player);
+    void teleport(DungeonPlayer player);
 
     /**
      * Adds the given player to the dungeon instance.
      *
      * @param player to add to the instance
      */
-    public void addPlayer(DungeonPlayer player);
+    void addPlayer(DungeonPlayer player);
 
-    public void addPlayer(DungeonPlayer player, boolean teleport);
+    void addPlayer(DungeonPlayer player, boolean teleport);
 
     /**
      * Removes the vien player from the dungeon instance if he is in it.
@@ -83,9 +83,9 @@ public interface DungeonInstance {
      *
      * @return true if player was removed, false if he wasn't in the dungeon
      */
-    public DungeonPlayer removePlayer(DungeonPlayer player);
+    DungeonPlayer removePlayer(DungeonPlayer player);
 
-    public DungeonPlayer removePlayer(DungeonPlayer player, boolean teleport);
+    DungeonPlayer removePlayer(DungeonPlayer player, boolean teleport);
 
     /**
      * Removes the vien player from the dungeon instance if he is in it.
@@ -94,7 +94,7 @@ public interface DungeonInstance {
      *
      * @return true if player was removed, false if he wasn't in the dungeon
      */
-    public DungeonPlayer removePlayer(UUID playerId);
+    DungeonPlayer removePlayer(UUID playerId);
 
     /**
      * Checks if the dungeon instance contains the player. Will also return true if
@@ -104,7 +104,7 @@ public interface DungeonInstance {
      *
      * @return true if player is registered in this instance
      */
-    public boolean containsPlayer(DungeonPlayer player);
+    boolean containsPlayer(DungeonPlayer player);
 
     /**
      * Checks if the dungeon instance contains the player. Will also return true if
@@ -114,42 +114,42 @@ public interface DungeonInstance {
      *
      * @return true if player is registered in this instance
      */
-    public boolean containsPlayer(UUID playerId);
+    boolean containsPlayer(UUID playerId);
 
     /**
      * Gets all players that are attached to this instance.
      *
      * @return list of players playing in this instance
      */
-    public Collection<DungeonPlayer> getPlayers();
+    Collection<DungeonPlayer> getPlayers();
 
     /**
      * Checks if the instance is currently used by players.
      *
      * @return true if instance is used by players
      */
-    public boolean isActive();
+    boolean isActive();
 
     /**
      * Marks the dungeon instance as active or inactive depending if players are playing it.
      *
      * @param active true if players are inside
      */
-    public void setActive(boolean active);
+    void setActive(boolean active);
 
     /**
      * Checks if all bosses have been killed and the instance has been cleared.
      *
      * @return true if instance is completed
      */
-    public boolean isCompleted();
+    boolean isCompleted();
 
     /**
      * Marks the dungeon aus completed when the players cleared out all enemies.
      *
      * @param completed true if dungeon is cleared
      */
-    public void setCompleted(boolean completed);
+    void setCompleted(boolean completed);
 
     /**
      * Checks if the dungeon is locked by an admin or other reasons. This prevents
@@ -158,17 +158,17 @@ public interface DungeonInstance {
      *
      * @return true if the base dungeon or the instance is locked.
      */
-    public boolean isLocked();
+    boolean isLocked();
 
     /**
      * Sets the dungeon instance as locked preventing player access.
      *
      * @param locked true if players cannot enter
      */
-    public void setLocked(boolean locked);
+    void setLocked(boolean locked);
 
     /**
      * Saves the world and every data to the database and files.
      */
-    public void save();
+    void save();
 }

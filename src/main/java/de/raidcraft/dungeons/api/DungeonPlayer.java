@@ -10,30 +10,30 @@ import java.util.UUID;
  */
 public interface DungeonPlayer {
 
-    public int getId();
+    int getId();
 
     /**
      * Gets the UUID of the player.
      *
      * @return player name
      */
-    public UUID getPlayerId();
+    UUID getPlayerId();
 
-    public void setLastPosition(Location lastPosition);
+    void setLastPosition(Location lastPosition);
 
     /**
      * Gets the last position of the player before he was teleported to the dungeon.
      *
      * @return last position of the player
      */
-    public Location getLastPosition();
+    Location getLastPosition();
 
     /**
      * Gets a list of dungeons the player is enlisted in.
      *
      * @return active and inactive dungeons the player is in
      */
-    public List<DungeonInstance> getDungeonInstances();
+    List<DungeonInstance> getDungeonInstances();
 
     /**
      * Tries to get an active instance of the given dungeon. If none exists
@@ -43,17 +43,17 @@ public interface DungeonPlayer {
      *
      * @return new or existing instance
      */
-    public DungeonInstance getDungeonInstance(Dungeon dungeon);
+    DungeonInstance getDungeonInstance(Dungeon dungeon);
 
-    public void addDungeonInstance(DungeonInstance newInstance);
+    void addDungeonInstance(DungeonInstance newInstance);
 
-    public void removeDungeonInstance(DungeonInstance newInstance);
+    void removeDungeonInstance(DungeonInstance newInstance);
 
-    public DungeonInstance getActiveInstance();
+    DungeonInstance getActiveInstance();
 
-    public void setActiveDungeonInstance(DungeonInstance activeInstance);
+    void setActiveDungeonInstance(DungeonInstance activeInstance);
 
-    public void leaveActiveDungeon(DungeonReason reason);
+    void leaveActiveDungeon(DungeonReason reason);
 
-    public void save();
+    void save();
 }

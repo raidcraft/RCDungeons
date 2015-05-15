@@ -10,21 +10,21 @@ import java.util.Optional;
  */
 public interface DungeonAPI {
 
-    public void create(Player creator, String dungeonName, String friendlyName);
+    void create(Player creator, String dungeonName, String friendlyName);
 
-    public void edit(Player player, String dungeonName);
+    void edit(Player player, String dungeonName);
 
-    public void start(String dungeonName, Player player, int radius);
+    void start(String dungeonName, Player player, int radius);
 
-    public void end(DungeonInstance instance, DungeonReason reason);
+    void end(DungeonInstance instance, DungeonReason reason);
 
-    public void exit(Player player);
+    void exit(Player player);
 
-    public boolean isDungeonTemplate(World world);
+    boolean isDungeonTemplate(World world);
 
-    public boolean isDungeonInstance(World world);
+    boolean isDungeonInstance(World world);
 
-    public Optional<DungeonInstance> getDungeonInstance(World world);
+    Optional<DungeonInstance> getDungeonInstance(World world);
 
-    public Optional<Dungeon> getDungeon(World world);
+    Optional<Dungeon> getDungeon(World world);
 }

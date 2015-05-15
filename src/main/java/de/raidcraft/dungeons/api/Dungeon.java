@@ -16,50 +16,50 @@ public interface Dungeon {
      *
      * @return database id
      */
-    public int getId();
+    int getId();
 
     /**
      * Gets the unique config name of the dungeon.
      *
      * @return unique config name
      */
-    public String getName();
+    String getName();
 
     /**
      * Gets the friendly name that can be displayed to players.
      *
      * @return friendly dungeon name
      */
-    public String getFriendlyName();
+    String getFriendlyName();
 
-    public void setFriendlyName(String friendlyName);
+    void setFriendlyName(String friendlyName);
 
     /**
      * Gets a description of the dungeon.
      *
      * @return short description
      */
-    public String getDescription();
+    String getDescription();
 
-    public void setDescription(String description);
+    void setDescription(String description);
 
     /**
      * Gets the time players have to clear the dungeon before it resets.
      *
      * @return time until dungeon is resettet
      */
-    public long getResetTimeMillis();
+    long getResetTimeMillis();
 
-    public void setResetTimeMillis(long resetTime);
+    void setResetTimeMillis(long resetTime);
 
     /**
      * Gets the location where players spawn when they initially enter the dungeon.
      *
      * @return default spawn location
      */
-    public Location getSpawnLocation();
+    Location getSpawnLocation();
 
-    public void setSpawnLocation(Location location);
+    void setSpawnLocation(Location location);
 
     /**
      * Locks the dungeon preventing the creation of new dungeon instances and prevents
@@ -67,7 +67,7 @@ public interface Dungeon {
      *
      * @return true if dungeon is locked
      */
-    public boolean isLocked();
+    boolean isLocked();
 
     /**
      * Locks the dungeon preventing new creation of dungeon instances. Also prevents
@@ -75,27 +75,27 @@ public interface Dungeon {
      *
      * @param locked state of the dungeon
      */
-    public void setLocked(boolean locked);
+    void setLocked(boolean locked);
 
-    public String getTemplateWorldName();
+    String getTemplateWorldName();
 
-    public World getTemplateWorld();
+    World getTemplateWorld();
 
-    public void setTemplateWorld(World templateWorld);
+    void setTemplateWorld(World templateWorld);
 
     /**
      * Gets a list of active instaces of this dungeon.
      *
      * @return list of active instances
      */
-    public List<DungeonInstance> getActiveInstances();
+    List<DungeonInstance> getActiveInstances();
 
     /**
      * Gets all instances that where created for this dungeon.
      *
      * @return list of all instances
      */
-    public List<DungeonInstance> getInstances();
+    List<DungeonInstance> getInstances();
 
     /**
      * Creates a new instance of the dungeon for the given party.
@@ -104,7 +104,7 @@ public interface Dungeon {
      *
      * @return created dungeon instance
      */
-    public DungeonInstance createInstance(UUID... players);
+    DungeonInstance createInstance(UUID... players);
 
     /**
      * Tries to get an instance of the dungeon for the given player.
@@ -114,7 +114,7 @@ public interface Dungeon {
      *
      * @return new or existing dungeon instance
      */
-    public DungeonInstance getActiveInstance(UUID player);
+    DungeonInstance getActiveInstance(UUID player);
 
-    public void save();
+    void save();
 }

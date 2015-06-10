@@ -5,7 +5,7 @@ import de.raidcraft.api.config.ConfigurationBase;
 import de.raidcraft.api.config.Setting;
 import de.raidcraft.dungeons.api.events.RCDungeonInstanceCreatedEvent;
 import de.raidcraft.dungeons.creator.DungeonWorldCreator;
-import net.minecraft.util.org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;

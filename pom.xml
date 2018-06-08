@@ -30,15 +30,15 @@
     </scm>
 
     <parent>
-        <groupId>de.raidcraft</groupId>
-        <artifactId>masterpom</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
+        <groupId>de.faldoria</groupId>
+        <artifactId>FaldoriaMasterPom</artifactId>
+        <version>1.12-0.1</version>
     </parent>
 
     <repositories>
         <repository>
-            <id>raidcraft</id>
-            <url>http://nexus.raid-craft.de/content/groups/public/</url>
+            <id>faldoria-deps</id>
+            <url>https://repo.faldoria.de/artifactory/faldoria-repo/</url>
         </repository>
     </repositories>
 

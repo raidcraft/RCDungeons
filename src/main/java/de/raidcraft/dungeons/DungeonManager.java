@@ -84,10 +84,10 @@ public class DungeonManager implements Component {
                         || dungeon.getFriendlyName().toLowerCase().startsWith(name.toLowerCase()))
                 .collect(Collectors.toList());
         if (foundDungeons.isEmpty()) {
-            throw new DungeonException("Did not find a dungeon with the name: " + name);
+            throw new DungeonException("Did not find a dungeon with the displayName: " + name);
         }
         if (foundDungeons.size() > 1) {
-            throw new DungeonException("Found multiple dungeons with the name " + name + ":" + StringUtils.join(foundDungeons, ", "));
+            throw new DungeonException("Found multiple dungeons with the displayName " + name + ":" + StringUtils.join(foundDungeons, ", "));
         }
         return foundDungeons.get(0);
     }
@@ -135,7 +135,7 @@ public class DungeonManager implements Component {
         return dungeon;
     }
 
-    private World createDungeonWorld(Player creator, String worldName) throws RaidCraftException {
+    private World createDungeonWorld(Player creator, String worldName) {
         // create empty world
         World world = Bukkit.createWorld(new DungeonWorldCreator(worldName, creator.getLocation()));
 

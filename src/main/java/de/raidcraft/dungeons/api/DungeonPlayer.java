@@ -15,7 +15,7 @@ public interface DungeonPlayer {
     /**
      * Gets the UUID of the player.
      *
-     * @return player name
+     * @return player displayName
      */
     UUID getPlayerId();
 

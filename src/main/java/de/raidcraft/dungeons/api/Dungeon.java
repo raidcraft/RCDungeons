@@ -19,16 +19,16 @@ public interface Dungeon {
     int getId();
 
     /**
-     * Gets the unique config name of the dungeon.
+     * Gets the unique config displayName of the dungeon.
      *
-     * @return unique config name
+     * @return unique config displayName
      */
     String getName();
 
     /**
-     * Gets the friendly name that can be displayed to players.
+     * Gets the friendly displayName that can be displayed to players.
      *
-     * @return friendly dungeon name
+     * @return friendly dungeon displayName
      */
     String getFriendlyName();
 

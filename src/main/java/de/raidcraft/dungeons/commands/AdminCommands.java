@@ -46,10 +46,10 @@ public class AdminCommands {
             aliases = {"create"},
             desc = "Creates a new dungeon with selected schematic",
             min = 2,
-            usage = "<name> <friendlyName>"
+            usage = "<displayName> <friendlyName>"
     )
     @CommandPermissions("rcdungeons.admin.create")
-    public void create(CommandContext args, CommandSender sender) throws CommandException {
+    public void create(CommandContext args, CommandSender sender) {
 
         plugin.create((Player) sender, args.getString(0), args.getString(1));
     }
@@ -83,7 +83,7 @@ public class AdminCommands {
             usage = "<dungeon_name>"
     )
     @CommandPermissions("rcdungeons.admin.edit")
-    public void edit(CommandContext args, CommandSender sender) throws CommandException {
+    public void edit(CommandContext args, CommandSender sender) {
 
         plugin.edit((Player) sender, args.getString(0));
     }

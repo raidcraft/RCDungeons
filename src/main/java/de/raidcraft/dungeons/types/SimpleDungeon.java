@@ -1,6 +1,5 @@
 package de.raidcraft.dungeons.types;
 
-import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.DungeonsPlugin;
 import de.raidcraft.dungeons.api.AbstractDungeon;
@@ -8,6 +7,7 @@ import de.raidcraft.dungeons.api.DungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonSpawn;
+import io.ebean.EbeanServer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.World;

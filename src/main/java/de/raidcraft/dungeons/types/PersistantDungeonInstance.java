@@ -1,17 +1,13 @@
 package de.raidcraft.dungeons.types;
 
-import com.avaje.ebean.EbeanServer;
 import de.raidcraft.RaidCraft;
 import de.raidcraft.dungeons.DungeonsPlugin;
-import de.raidcraft.dungeons.api.AbstractDungeonInstance;
-import de.raidcraft.dungeons.api.Dungeon;
-import de.raidcraft.dungeons.api.DungeonPlayer;
-import de.raidcraft.dungeons.api.DungeonReason;
-import de.raidcraft.dungeons.api.WorldNotLoadedExpcetion;
+import de.raidcraft.dungeons.api.*;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
 import de.raidcraft.dungeons.tables.TDungeonInstancePlayer;
 import de.raidcraft.dungeons.tables.TDungeonPlayer;
 import de.raidcraft.dungeons.util.DungeonUtils;
+import io.ebean.EbeanServer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -107,7 +103,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
         database.save(instance);
         for (DungeonPlayer player : getPlayers()) {
             TDungeonInstancePlayer tDungeonPlayer = database.find(TDungeonInstancePlayer.class)
-                    .where().eq("instance_id", getId()).eq("player_id", player.getId()).findUnique();
+                    .where().eq("instance_id", getId()).eq("player_id", player.getId()).findOne();
             if (tDungeonPlayer == null) {
                 tDungeonPlayer = new TDungeonInstancePlayer();
                 tDungeonPlayer.setInstance(instance);

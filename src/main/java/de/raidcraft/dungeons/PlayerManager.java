@@ -61,7 +61,7 @@ public class PlayerManager implements Listener {
     public boolean playerExists(UUID playerId) {
 
         return plugin.getDatabase().find(TDungeonPlayer.class)
-                .where().eq("player_id", playerId).findUnique() != null;
+                .where().eq("player_id", playerId).findOne() != null;
     }
 
     public DungeonPlayer getPlayer(UUID playerId) {
@@ -71,7 +71,7 @@ public class PlayerManager implements Listener {
         }
         Player bukkitPlayer = Bukkit.getPlayer(playerId);
         TDungeonPlayer tDungeonPlayer = plugin.getDatabase().find(TDungeonPlayer.class)
-                .where().eq("player_id", playerId).findUnique();
+                .where().eq("player_id", playerId).findOne();
         if (tDungeonPlayer == null) {
             // create new TDungeonPlayer
             tDungeonPlayer = new TDungeonPlayer();

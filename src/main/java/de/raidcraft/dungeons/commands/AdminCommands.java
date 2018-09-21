@@ -132,7 +132,7 @@ public class AdminCommands {
         }
         Dungeon dungeon = optional.get();
         TDungeonSpawn spawn = plugin.getDatabase().find(TDungeonSpawn.class)
-                .where().eq("dungeon_id", dungeon.getId()).findUnique();
+                .where().eq("dungeon_id", dungeon.getId()).findOne();
         spawn.setSpawn(player.getLocation());
         plugin.getDatabase().update(spawn);
         dungeon.setSpawnLocation(player.getLocation());

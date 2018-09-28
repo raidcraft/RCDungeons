@@ -60,7 +60,7 @@ public class PlayerManager implements Listener {
 
     public boolean playerExists(UUID playerId) {
 
-        return plugin.getDatabase().find(TDungeonPlayer.class)
+        return plugin.getRcDatabase().find(TDungeonPlayer.class)
                 .where().eq("player_id", playerId).findOne() != null;
     }
 
@@ -70,7 +70,7 @@ public class PlayerManager implements Listener {
             return players.get(playerId);
         }
         Player bukkitPlayer = Bukkit.getPlayer(playerId);
-        TDungeonPlayer tDungeonPlayer = plugin.getDatabase().find(TDungeonPlayer.class)
+        TDungeonPlayer tDungeonPlayer = plugin.getRcDatabase().find(TDungeonPlayer.class)
                 .where().eq("player_id", playerId).findOne();
         if (tDungeonPlayer == null) {
             // create new TDungeonPlayer
@@ -85,7 +85,7 @@ public class PlayerManager implements Listener {
                 tDungeonPlayer.setLastPitch(location.getPitch());
                 tDungeonPlayer.setLastYaw(location.getYaw());
             }
-            plugin.getDatabase().save(tDungeonPlayer);
+            plugin.getRcDatabase().save(tDungeonPlayer);
         }
         BukkitDungeonPlayer dungeonPlayer = new BukkitDungeonPlayer(tDungeonPlayer);
         players.put(dungeonPlayer.getPlayerId(), dungeonPlayer);

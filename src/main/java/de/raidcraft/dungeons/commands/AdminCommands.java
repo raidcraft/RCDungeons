@@ -131,10 +131,10 @@ public class AdminCommands {
             throw new CommandException("You are not in a template dungeon");
         }
         Dungeon dungeon = optional.get();
-        TDungeonSpawn spawn = plugin.getDatabase().find(TDungeonSpawn.class)
+        TDungeonSpawn spawn = plugin.getRcDatabase().find(TDungeonSpawn.class)
                 .where().eq("dungeon_id", dungeon.getId()).findOne();
         spawn.setSpawn(player.getLocation());
-        plugin.getDatabase().update(spawn);
+        plugin.getRcDatabase().update(spawn);
         dungeon.setSpawnLocation(player.getLocation());
         dungeon.save();
     }

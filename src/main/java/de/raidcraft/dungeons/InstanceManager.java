@@ -1,12 +1,7 @@
 package de.raidcraft.dungeons;
 
 import de.raidcraft.RaidCraft;
-import de.raidcraft.dungeons.api.Dungeon;
-import de.raidcraft.dungeons.api.DungeonException;
-import de.raidcraft.dungeons.api.DungeonInstance;
-import de.raidcraft.dungeons.api.DungeonPlayer;
-import de.raidcraft.dungeons.api.DungeonReason;
-import de.raidcraft.dungeons.api.WorldNotLoadedExpcetion;
+import de.raidcraft.dungeons.api.*;
 import de.raidcraft.dungeons.api.events.RCDungeonInstanceLoadedEvent;
 import de.raidcraft.dungeons.tables.TDungeon;
 import de.raidcraft.dungeons.tables.TDungeonInstance;
@@ -20,11 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Dragonfire
@@ -43,7 +34,7 @@ public class InstanceManager implements Listener {
 
     public void load() {
 
-        plugin.getDatabase().find(TDungeonInstance.class)
+        plugin.getRcDatabase().find(TDungeonInstance.class)
                 .where().eq("completed", 0).eq("locked", 0)
                 .findList().stream().forEach(tInstance -> {
             try {
@@ -70,12 +61,12 @@ public class InstanceManager implements Listener {
 
         // prepare an initial table entry to provide a valid id to the new dungeon instance
         TDungeonInstance tableEntry = new TDungeonInstance();
-        tableEntry.setDungeon(plugin.getDatabase().find(TDungeon.class, dungeon.getId()));
+        tableEntry.setDungeon(plugin.getRcDatabase().find(TDungeon.class, dungeon.getId()));
         tableEntry.setCompleted(false);
         tableEntry.setLocked(false);
         tableEntry.setActive(false);
         tableEntry.setCreationTime(new Date());
-        plugin.getDatabase().save(tableEntry);
+        plugin.getRcDatabase().save(tableEntry);
 
         // now we have our id we can create the actual dungeon instance
         PersistantDungeonInstance instance = new PersistantDungeonInstance(tableEntry, dungeon);

@@ -57,7 +57,7 @@ public class DungeonManager implements Component {
 
     private void load() {
 
-        for (TDungeon dungeon : plugin.getDatabase().find(TDungeon.class).findList()) {
+        for (TDungeon dungeon : plugin.getRcDatabase().find(TDungeon.class).findList()) {
             SimpleDungeon simpleDungeon = new SimpleDungeon(dungeon, DungeonUtils.getTemplateWorldName(dungeon.getName()));
             this.dungeons.put(simpleDungeon.getName(), simpleDungeon);
             plugin.info("Loaded dungeon template for: " + simpleDungeon.getName() + " - " + simpleDungeon.getFriendlyName());
@@ -119,12 +119,12 @@ public class DungeonManager implements Component {
         tDungeon.setLocked(true);
         tDungeon.setFriendlyName(friendlyName);
         tDungeon.setResetTimeMillis(TimeUtil.secondsToMillis(plugin.getConfig().default_reset_time));
-        plugin.getDatabase().save(tDungeon);
+        plugin.getRcDatabase().save(tDungeon);
 
         Location origin = creator.getLocation();
         TDungeonSpawn spawn = new TDungeonSpawn(origin);
         spawn.setDungeon(tDungeon);
-        plugin.getDatabase().save(spawn);
+        plugin.getRcDatabase().save(spawn);
 
         SimpleDungeon dungeon = new SimpleDungeon(tDungeon, DungeonUtils.getTemplateWorldName(tDungeon.getName()));
         Location loc = creator.getLocation();

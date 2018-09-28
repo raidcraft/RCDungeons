@@ -35,7 +35,7 @@ public class PersistantDungeonInstance extends AbstractDungeonInstance {
 
         DungeonsPlugin plugin = RaidCraft.getComponent(DungeonsPlugin.class);
         // lazy load player, otherwise player load dungeons that don't exists atm
-        //        plugin.getDatabase().find(TDungeonInstancePlayer.class)
+        //        plugin.getRcDatabase().find(TDungeonInstancePlayer.class)
         //                .where().eq("instance_id", tInstance.getId()).findList()
         //                .stream().forEach(player -> {
         //                    TDungeonPlayer tDungeonPlayer = player.getPlayer();

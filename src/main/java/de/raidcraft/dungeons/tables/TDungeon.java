@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "dungeons_dungeons")
+@Table(name = "rc_dungeons_dungeons")
 public class TDungeon {
 
     @Id

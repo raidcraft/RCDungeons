@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="rc_dungeons_dungeons" pkName="pk_rc_dungeons_dungeons">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="name" type="varchar" notnull="true" unique="uq_rc_dungeons_dungeons_name"/>
+            <column name="friendly_name" type="varchar"/>
+            <column name="description" type="varchar"/>
+            <column name="reset_time_millis" type="bigint" notnull="true"/>
+            <column name="locked" type="boolean" defaultValue="false" notnull="true"/>
+        </createTable>
+        <createTable name="rc_dungeons_dungeon_instances" pkName="pk_rc_dungeons_dungeon_instances">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="dungeon_id" type="integer" references="rc_dungeons_dungeons.id"
+                    foreignKeyName="fk_rc_dungeons_dungeon_instances_dungeon_id"
+                    foreignKeyIndex="ix_rc_dungeons_dungeon_instances_dungeon_id"/>
+            <column name="creation_time" type="timestamp" notnull="true"/>
+            <column name="active" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="completed" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="locked" type="boolean" defaultValue="false" notnull="true"/>
+        </createTable>
+        <createTable name="rc_dungeons_dungeon_instance_players" pkName="pk_rc_dungeons_dungeon_instance_players">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="player_id" type="integer" references="rc_dungeons_dungeon_players.id"
+                    foreignKeyName="fk_rc_dungeons_dungeon_instance_players_player_id"
+                    foreignKeyIndex="ix_rc_dungeons_dungeon_instance_players_player_id"/>
+            <column name="instance_id" type="integer" references="rc_dungeons_dungeon_instances.id"
+                    foreignKeyName="fk_rc_dungeons_dungeon_instance_players_instance_id"
+                    foreignKeyIndex="ix_rc_dungeons_dungeon_instance_players_instance_id"/>
+        </createTable>
+        <createTable name="rc_dungeons_dungeon_players" pkName="pk_rc_dungeons_dungeon_players">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="player" type="varchar"/>
+            <column name="player_id" type="uuid"/>
+            <column name="last_world" type="varchar"/>
+            <column name="last_x" type="double" notnull="true"/>
+            <column name="last_y" type="double" notnull="true"/>
+            <column name="last_z" type="double" notnull="true"/>
+            <column name="last_yaw" type="float" notnull="true"/>
+            <column name="last_pitch" type="float" notnull="true"/>
+        </createTable>
+        <createTable name="rc_dungeons_dungeon_spawns" pkName="pk_rc_dungeons_dungeon_spawns">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="dungeon_id" type="integer" references="rc_dungeons_dungeons.id"
+                    foreignKeyName="fk_rc_dungeons_dungeon_spawns_dungeon_id"
+                    foreignKeyIndex="ix_rc_dungeons_dungeon_spawns_dungeon_id"/>
+            <column name="spawn_x" type="integer" notnull="true"/>
+            <column name="spawn_y" type="integer" notnull="true"/>
+            <column name="spawn_z" type="integer" notnull="true"/>
+            <column name="spawn_yaw" type="float" notnull="true"/>
+            <column name="spawn_pitch" type="float" notnull="true"/>
+        </createTable>
+    </changeSet>
+</migration>

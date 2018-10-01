@@ -1,0 +1,3 @@
+entity-packages: de.raidcraft.dungeons
+transactional-packages: de.raidcraft.dungeons
+querybean-packages: de.raidcraft.dungeons

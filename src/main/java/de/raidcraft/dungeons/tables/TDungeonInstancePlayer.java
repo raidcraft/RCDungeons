@@ -9,7 +9,7 @@ import javax.persistence.Table;
  * @author Silthus
  */
 @Entity
-@Table(name = "dungeons_dungeon_instance_players")
+@Table(name = "rc_dungeons_dungeon_instance_players")
 public class TDungeonInstancePlayer {
 
     @Id

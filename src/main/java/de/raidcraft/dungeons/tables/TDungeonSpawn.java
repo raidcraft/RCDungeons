@@ -16,7 +16,7 @@ import javax.persistence.Table;
 @Setter
 @Getter
 @Entity
-@Table(name = "dungeons_dungeon_spawns")
+@Table(name = "rc_dungeons_dungeon_spawns")
 public class TDungeonSpawn {
 
     @Id

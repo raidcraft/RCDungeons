@@ -1,10 +1,14 @@
 package de.raidcraft.dungeons.creator;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.craftbukkit.v1_13_R2.generator.CraftChunkData;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +44,6 @@ public class DungeonWorldCreator extends WorldCreator {
             public List<BlockPopulator> getDefaultPopulators(World world) {
 
                 return new ArrayList<>();
-            }
-
-            @Override
-            @Deprecated
-            public byte[][] generateBlockSections(World world, Random random, int x, int z, BiomeGrid biomes) {
-
-                return new byte[world.getMaxHeight() / 16][]; //world height / chunk part height (=16, look above)
             }
         });
     }
